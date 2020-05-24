@@ -11,9 +11,9 @@
 /*
  *  Creates a node.
  */
-struct node *new_node(int d)
+struct Node *new_node(int d)
 {
-    struct node *tmp = (struct node*) malloc(sizeof(struct node)); //Allocates memory for node and assigns its adress to tmp pointer.
+    struct Node *tmp = (struct Node*) malloc(sizeof(struct Node)); //Allocates memory for node and assigns its adress to tmp pointer.
     tmp->data = d;
     tmp->next = NULL;
     return tmp;
@@ -22,9 +22,9 @@ struct node *new_node(int d)
 /*
  *  Creates a queue.
  */
-struct queue *create_queue()
+struct Queue *create_queue()
 {
-    struct queue *tmp = (struct queue*) malloc(sizeof(struct queue)); //Allocates memory for queue and assigns its adress to tmp pointer.
+    struct Queue *tmp = (struct Queue*) malloc(sizeof(struct Queue)); //Allocates memory for queue and assigns its adress to tmp pointer.
     tmp->front = NULL;
     tmp->rear = NULL;
     return tmp;
@@ -33,10 +33,10 @@ struct queue *create_queue()
 /*
  *  Adds integer d to the rear of the queue.
  */
-void enqueue(struct queue *q, int d)
+void enqueue(struct Queue *q, int d)
 {
     //Create a node for the new integer.
-    struct node *tmp = new_node(d);
+    struct Node *tmp = new_node(d);
 
     //Checking if the queue was empty
     if(q->rear == NULL)
@@ -54,14 +54,14 @@ void enqueue(struct queue *q, int d)
 /*
  *  Removes the first entered node from the existing ones and return its data.
  */
-int dequeue(struct queue *q)
+int dequeue(struct Queue *q)
 {
     //Check if queue was empty
     if(q->front == NULL)
         return -1; //Note we're returning -1 as pid are always a positive number, so its a safe assumption.
     
     //Get a pointer to the node to be removed.
-    struct node *tmp = q->front;
+    struct Node *tmp = q->front;
     //Update the front of the queue.
     q->front = tmp->next;
 

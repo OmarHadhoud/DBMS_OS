@@ -6,17 +6,17 @@
 /*
  * Node structure of linked list.  
  */
-struct node {
+struct Node {
     int data;
-    struct node* next; //The next node
+    struct Node* next; //The next node
 };
 
 /*
  * Queue structure consisting of a linked list and a front and rear nodes.  
  */
-struct queue
+struct Queue
 {
-    struct node *front, *rear; 
+    struct Node *front, *rear; 
 };
 
 
@@ -30,10 +30,10 @@ struct queue
  * dequeue: Gets and removes the first element entered the queue from the existing ones.
  */
 
-struct node* new_node(int d);
+struct Node* new_node(int d);
 
-struct queue* create_queue();
-void enqueue(struct queue *q, int d);
-int dequeue(struct queue *q);
+struct Queue* create_queue();
+void enqueue(struct Queue *q, int d);
+int dequeue(struct Queue *q);
 
 #endif /* _QUEUE_H_ */
