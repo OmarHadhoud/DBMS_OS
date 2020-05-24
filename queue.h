@@ -26,6 +26,8 @@ struct Queue
  * new_node: Creates a new node. 
  * 
  * create_queue: Creates queue and returns it.
+ * delete_queue: Deletes the queue while making sure we free all allocated memory.
+ * 
  * enqueue: Adds item d to the end of the queue.
  * dequeue: Gets and removes the first element entered the queue from the existing ones.
  */
@@ -33,6 +35,8 @@ struct Queue
 struct Node* new_node(int d);
 
 struct Queue* create_queue();
+void delete_queue(struct Queue *q);
+
 void enqueue(struct Queue *q, int d);
 int dequeue(struct Queue *q);
 
