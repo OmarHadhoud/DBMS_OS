@@ -10,7 +10,7 @@ struct system_information; //Forward declaration of system info struct.
 struct initializing_msg //The initializing message that contains system data.
 {
     long mtype; //The receiver pid
-    struct system_information *sys_info;
+    struct system_information sys_info;
     int role;
 };
 
