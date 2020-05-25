@@ -101,8 +101,7 @@ void setup_processes()
     struct initializing_msg setup_msg[num_forked];  
     //Assign the system info ptr in the message
     for(int i = 0; i < num_forked; i++)
-        setup_msg[i].sys_info = &sys_info;
-    
+        setup_msg[i].sys_info = sys_info;
     //Assign roles to each process
     setup_msg[0].role = db_manager;
     setup_msg[1].role = logger;
@@ -147,7 +146,7 @@ void receive_setup()
     }
 
     //Get the system info
-    sys_info = *msg_buffer.sys_info;
+    sys_info = msg_buffer.sys_info;
     //Get the process role
     process_role = msg_buffer.role;
 }
