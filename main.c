@@ -1,7 +1,7 @@
 #include "parent.h"
+#include <stdio.h>
 
-
-void main()
+int main()
 {
     //Read the configuration file first and get number of clients from it.
     int n = read_config();
@@ -13,17 +13,6 @@ void main()
         setup_processes();
     } else
         receive_setup();
-    if(process_role == parent)
-        parent_main();
-    else if(process_role == db_manager)
-        db_manager_main();
-    else if(process_role == db_client)
-        db_client_main();
-    else if(process_role == logger)
-        logger_main();
-    else if(process_role == query_logger)
-        query_logger_main();
-    else if(process_role == deadlock_detector)
-        deadlock_detector_main();   
-       
+    process_main();
+    return 0;
 }
