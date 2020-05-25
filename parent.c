@@ -12,6 +12,9 @@
 #include <sys/shm.h>
 //To send initializing system messages.
 #include "messages.h"
+//To handle signals of children dying
+#include <sys/signal.h>
+#include <sys/wait.h>
 
 /*
  * Parent functions.
@@ -177,4 +180,11 @@ void process_main()
 void parent_main()
 {
     printf("I'm the parent, my pid is : %d\n", getpid());
+    //Wait for all children to die then exit
+    int stat_loc;
+    while(num_forked != 0)
+    {
+        wait(&stat_loc);
+        num_forked--;
+    }
 }

@@ -1,5 +1,7 @@
 #include "parent.h"
 #include <stdio.h>
+#include <sys/signal.h>
+#include <sys/unistd.h>
 
 int main()
 {
@@ -14,5 +16,5 @@ int main()
     } else
         receive_setup();
     process_main();
-    return 0;
+    exit(0);
 }
