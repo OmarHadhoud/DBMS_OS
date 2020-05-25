@@ -187,4 +187,6 @@ void parent_main()
         wait(&stat_loc);
         num_forked--;
     }
+    //Free memory we allocated for pids list
+    free(pids);
 }
