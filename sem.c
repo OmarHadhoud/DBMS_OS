@@ -4,6 +4,7 @@
 #include <stdlib.h>
 //To send signal to process acquiring the semaphore to continue.
 #include <signal.h>
+#include <sys/msg.h>
 /*
  * Semaphores functions.
  */
@@ -23,6 +24,7 @@ void sem_initialize(struct Sem *s)
         s = NULL;
         return;
     }
+    
     s->waiting_queue = create_queue();
     //If we ran out of memory, free the sem_holder and return.
     if (s->waiting_queue == NULL)
@@ -31,6 +33,7 @@ void sem_initialize(struct Sem *s)
         s = NULL;
         return;
     }
+    printf("Sem initialized  _%d\n", getpid());
 }
 
 /*
@@ -41,6 +44,21 @@ void sem_delete(struct Sem *s)
     free(s->sem_holder);
     delete_queue(s->waiting_queue);
 }
+
+/*void acquire_sem_msg(struct Sem *s, int pid){
+    struct MsgBuff message;
+    if (msgrcv(msgqid, &message, sizeof(message)-sizeof(message.mtype), getpid(), IPC_NOWAIT)==-1) return;
+    if (message.acquire_sem)
+    {
+        acquire_sem(sem,message.sender);
+    }else
+    {
+        release_sem(sem,message.sender);
+    }
+    if (msgsnd(msgqid, &message, sizeof(message)-sizeof(message.mtype), !IPC_NOWAIT)==-1) perror("Errror in send");
+}*/
+
+
 
 /*
  *  Acquires the semaphor to the passed process.
@@ -56,8 +74,10 @@ void acquire_sem(struct Sem *s, int pid)
         s->sem_holder = pid;
         kill(pid, SIGCONT);
     }
-    else //Add the process to the waiting queue.
+    else { //Add the process to the waiting queue.
         enqueue(s->waiting_queue, pid);
+        kill(pid, SIGSTOP);
+    }
 }
 
 /*
