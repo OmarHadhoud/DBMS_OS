@@ -2,6 +2,8 @@
 #define _LOGGER_H_
 #define MEM_SIZE 10
 #define FILE_NAME_MAX 10
+#define MAX_LOG_LINE_SIZE 100
+
 #include "parent.h"
 #include "sem.h"
 //To use pid_t
@@ -16,13 +18,13 @@ struct MsgBuff
 };
 struct SingleLog {
     pid_t client_pid;
-    char * msg;
+    char msg[MAX_LOG_LINE_SIZE];
 };
 struct LoggerSharedMemory {
-    struct SingleLog logs_array[MEM_SIZE];    
     unsigned int producer_idx;
     unsigned int consumer_idx;
     pid_t waiting_pid;
+    struct SingleLog logs_array[MEM_SIZE];    
 };
 struct LoggerSharedMemory *logger_shared_memory;
 struct Sem sem;

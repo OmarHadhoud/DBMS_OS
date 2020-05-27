@@ -1,10 +1,13 @@
 #include "sem.h"
 
+#include <stdio.h>
 //To allocate and free memory we need stdlib.
 #include <stdlib.h>
 //To send signal to process acquiring the semaphore to continue.
 #include <signal.h>
 #include <sys/msg.h>
+//getpid()
+
 /*
  * Semaphores functions.
  */
@@ -69,14 +72,18 @@ void acquire_sem(struct Sem *s, int pid)
 {
     if (s->locked == 0)
     {
+        printf("sem going to %d %d\n",pid,(int)getpid());
         //Acquire the sem, wake the process.
         s->locked = 1;
-        s->sem_holder = pid;
+        printf("sem going to %d %d\n",pid,(int)getpid());
+        *(s->sem_holder) = pid;
+        printf("sem going to %d %d\n",pid,(int)getpid());
         kill(pid, SIGCONT);
     }
     else { //Add the process to the waiting queue.
         enqueue(s->waiting_queue, pid);
         kill(pid, SIGSTOP);
+        printf("%d paused\n",pid);
     }
 }
 
@@ -86,16 +93,16 @@ void acquire_sem(struct Sem *s, int pid)
  */
 void release_sem(struct Sem *s, int pid)
 {
-    if (s->sem_holder != pid) //Make sure the one releasing sem is the holder.
+    if (*(s->sem_holder) != pid) //Make sure the one releasing sem is the holder.
         return;
-
+    
     s->locked = 0;
     s->sem_holder = NULL;
     //If no process is in waiting queue, return.
     if (s->waiting_queue->front == NULL)
         return;
     //Get the next process id to acquire the semaphore.
-    int next_pid = s->waiting_queue->front;
+    int next_pid = s->waiting_queue->front->data;
     dequeue(s->waiting_queue);
     acquire_sem(s, next_pid); //Give the semaphore to the process waiting.
 }

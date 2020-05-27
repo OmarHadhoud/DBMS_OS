@@ -4,6 +4,8 @@
 //Including the queue header needed for waiting queue.
 #include "queue.h"
 
+#include <sys/types.h>
+#include <unistd.h>
 //Definition of semaphore
 
 /*
@@ -11,7 +13,7 @@
  */
 struct Sem {
     _Bool locked; //If locked, no process can acquire this semaphore until it is released.
-    char *sem_holder; //The id of the process that holds the semaphore. Should equal NULL if sem is not locked.
+    pid_t *sem_holder; //The id of the process that holds the semaphore. Should equal NULL if sem is not locked.
     struct Queue *waiting_queue; //The queue of ids of the processes waiting on this semaphore to be released. It is a queue [FIFO].
 };
 
@@ -34,7 +36,7 @@ struct Sem {
  * and will get blocked if semaphore is already locked.
  * 
  * release_sem: The passed process will try to release the semaphore,
- * this can only happen if it's the one holding the semaphore. It will
+ * this can only happen if it's the one holding the semaphore. It will*
  * give the semaphore to the next process waiting on the sem queue.
  */
 

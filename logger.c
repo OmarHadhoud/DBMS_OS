@@ -2,11 +2,16 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
 //To use shared memory
 #include <sys/ipc.h>
 #include <sys/shm.h>
 //To use signals
 #include <signal.h>
+#include <string.h>
+//To use Msgs
+#include <sys/types.h>
+#include <sys/msg.h>
 
 /*
  * Handles sending and receiving
@@ -24,8 +29,8 @@ void MsgSystem(){
     
     }else
     {
+
         release_sem(&sem,message.sender);
-            
     }
 }
 /*
@@ -51,9 +56,12 @@ void Produce(char *msg){
     {} //queue full please sleep
     printf("Queue isn't full (logger) _%d\n", getpid());
     // adding logs
-    logger_shared_memory->logs_array[(logger_shared_memory->producer_idx+1)%MEM_SIZE] = log;
+    logger_shared_memory->logs_array[(logger_shared_memory->producer_idx+1)%MEM_SIZE].client_pid = log.client_pid;
+    strcpy(logger_shared_memory->logs_array[(logger_shared_memory->producer_idx+1)%MEM_SIZE].msg,log.msg);
+    printf("\n\n");
+    printf("%s\n",log.msg);
+    printf("%s\n",logger_shared_memory->logs_array[(logger_shared_memory->producer_idx+1)%MEM_SIZE].msg);
     logger_shared_memory->producer_idx++;
-
     message.mtype = sys_info.logger_pid ;
     message.sender = getpid();
     message.acquire_sem = 0;
@@ -69,15 +77,17 @@ int Consume(){
     struct SingleLog log;
     if ((logger_shared_memory->producer_idx%MEM_SIZE == logger_shared_memory->consumer_idx%MEM_SIZE ))
     {return 1;} //no logs to consume
-
     // adding logs
     log = logger_shared_memory->logs_array[(logger_shared_memory->consumer_idx+1)%MEM_SIZE];
     logger_shared_memory->consumer_idx++;
-    char * f_name;
-    snprintf(f_name, FILE_NAME_MAX, "%d.txt", log.client_pid);
+    char f_name[FILE_NAME_MAX];
+    snprintf(f_name, FILE_NAME_MAX,"%d.txt", (int)log.client_pid);
     FILE *F = fopen(f_name, "w");
     if (F == NULL) perror("Couldn't create file");
+    printf("--------------Starting consuming %d  %s _%d \n ",log.client_pid,log.msg,getpid());
     fprintf(F, "%s\n", log.msg);
+    fflush(F);
+    fclose(F);
     return 0;                       
 }
 
@@ -99,6 +109,7 @@ void logger_main()
     logger_shared_memory->consumer_idx=0;
     logger_shared_memory->producer_idx=0;
     //Initialize Semaphore
+    //sem = malloc(sizeof(struct Sem));
     sem_initialize(&sem);
 
     while (loggerOn)
@@ -106,7 +117,7 @@ void logger_main()
         MsgSystem();
         Consume();
     }
-    
+    printf("Logger dying bye bye\n");
     sem_delete(&sem);
     //Detach from logger shared memory  
     shmdt(logger_shared_memory); 

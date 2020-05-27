@@ -16,5 +16,5 @@ int main()
     } else
         receive_setup();
     process_main();
-    exit(0);
+    return 0;
 }

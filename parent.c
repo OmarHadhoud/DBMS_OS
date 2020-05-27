@@ -85,7 +85,7 @@ void initialize_resources()
     
     //Create the shared memory segment for logger struct.
     //TODO: Use sizeof(logger_struct) instead when done
-    sys_info.logger_shmid = shmget(IPC_PRIVATE,sizeof(int),0666|IPC_CREAT);
+    sys_info.logger_shmid = shmget(IPC_PRIVATE,sizeof(struct LoggerSharedMemory),0666|IPC_CREAT);
 
     //The first forked process is the db_manager, second is logger, third is query_logger,
     //Fourth is deadlock_detector, the rest are the db_clients.
