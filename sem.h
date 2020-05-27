@@ -6,6 +6,8 @@
 
 #include <sys/types.h>
 #include <unistd.h>
+
+#define SEM_VERBOS 0 
 //Definition of semaphore
 
 /*

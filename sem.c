@@ -72,18 +72,17 @@ void acquire_sem(struct Sem *s, int pid)
 {
     if (s->locked == 0)
     {
-        printf("sem going to %d %d\n",pid,(int)getpid());
+        if(SEM_VERBOS) printf("sem given by %d to %d\n",(int)getpid(),pid);
         //Acquire the sem, wake the process.
         s->locked = 1;
-        printf("sem going to %d %d\n",pid,(int)getpid());
-        *(s->sem_holder) = pid;
-        printf("sem going to %d %d\n",pid,(int)getpid());
+        *(s->sem_holder) = (pid_t)pid;
         kill(pid, SIGCONT);
+        if(SEM_VERBOS) printf("proccess %d resumed\n",pid);
     }
     else { //Add the process to the waiting queue.
         enqueue(s->waiting_queue, pid);
         kill(pid, SIGSTOP);
-        printf("%d paused\n",pid);
+        if(SEM_VERBOS) printf("proccess %d paused\n",pid);
     }
 }
 
@@ -97,7 +96,7 @@ void release_sem(struct Sem *s, int pid)
         return;
     
     s->locked = 0;
-    s->sem_holder = NULL;
+    *(s->sem_holder) = -1;
     //If no process is in waiting queue, return.
     if (s->waiting_queue->front == NULL)
         return;

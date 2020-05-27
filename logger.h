@@ -1,9 +1,9 @@
 #ifndef _LOGGER_H_
 #define _LOGGER_H_
 #define MEM_SIZE 10
-#define FILE_NAME_MAX 10
+#define FILE_NAME_MAX 20
 #define MAX_LOG_LINE_SIZE 100
-
+#define L_VERBOS 0
 #include "parent.h"
 #include "sem.h"
 //To use pid_t
@@ -28,6 +28,7 @@ struct LoggerSharedMemory {
 };
 struct LoggerSharedMemory *logger_shared_memory;
 struct Sem sem;
+int current_number_of_produced;
 int loggerOn; 
 
 void MsgSystem();
