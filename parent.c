@@ -186,6 +186,12 @@ void parent_main()
     {
         wait(&stat_loc);
         num_forked--;
+        printf("\nCurrent forks: %d\n",num_forked);
+        if (num_forked==1)
+        {
+            kill(sys_info.logger_pid, SIGUSR1);
+        }
+        
     }
     //Free memory we allocated for pids list
     free(pids);
