@@ -17,6 +17,8 @@ void client_main()
     logger_shared_memory = (struct LoggerSharedMemory*) shmat(sys_info.logger_shmid,NULL,0);
     Produce(msg);
     Produce(msg2);
+    acquire_query_logger_sem();
+    release_query_logger_sem();
 }
 
 /*
@@ -34,14 +36,14 @@ void client_add_record(char name[20], int salary, int key)
         if(name[i] >= 'a' && name[i] <= 'z')
             buff.message_record.name[i] = name[i];
     }
-    int send_val = msgsnd(msgqid, &buff, sizeof(buff.message_record), 0);
+    int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), 0);
     if (send_val == -1)
         perror("Error in send");
         
     kill(sys_info.db_manager_pid,SIGCONT);
     raise(SIGSTOP);
 
-    int rec_val = msgrcv(msgqid, &buff, sizeof(buff.message_record), getpid(), 0);
+    int rec_val = msgrcv(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), getpid(), 0);
     if (rec_val == -1)
         perror("Error in recieve");
 
@@ -59,7 +61,7 @@ void client_modify(int key, int value)
     buff.message_record.key = key;
     buff.message_record.salary = value;
     buff.pid = getpid();
-    int send_val = msgsnd(msgqid, &buff, sizeof(buff.message_record), 0);
+    int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), 0);
     if (send_val == -1)
         perror("Error in send");
 
@@ -76,7 +78,7 @@ void client_acquire(int key)
     buff.mtype = sys_info.db_manager_pid;
     buff.message_record.key = key;
     buff.pid = getpid();
-    int send_val = msgsnd(msgqid, &buff, sizeof(buff.message_record), 0);
+    int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), 0);
     if (send_val == -1)
         perror("Error in send");
 
@@ -95,7 +97,7 @@ void client_release(int key)
     buff.mtype = sys_info.db_manager_pid;
     buff.message_record.key = key;
     buff.pid = getpid();
-    int send_val = msgsnd(msgqid, &buff, sizeof(buff.message_record), 0);
+    int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), 0);
     if (send_val == -1)
         perror("Error in send");
 
