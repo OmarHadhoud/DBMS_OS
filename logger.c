@@ -19,7 +19,7 @@
 void MsgSystem(){
     struct MsgBuff message={.mtype = sys_info.logger_pid , .sender = getpid() , .acquire_sem = 1};
     if(logger_shared_memory->producer_idx-logger_shared_memory->consumer_idx!=0){ //if there is need to consume don't wait 
-        if (msgrcv(msgqid, &message, sizeof(message)-sizeof(message.mtype), getpid(), IPC_NOWAIT)==-1) 
+        if (msgrcv(sys_info.logger_msgqid, &message, sizeof(message)-sizeof(message.mtype), getpid(), IPC_NOWAIT)==-1) 
         {
             if (current_number_of_produced) if(L_VERBOS) printf("\n Didn't rec %d\n", current_number_of_produced);
             
@@ -28,7 +28,7 @@ void MsgSystem(){
         //debugging
         //printf("n-----%d:  %d-%d = %d \n",message.sender,logger_shared_memory->producer_idx,logger_shared_memory->consumer_idx,current_number_of_produced);
     } else  {//keep waiting for new produced if all is consumed
-        if (msgrcv(msgqid, &message, sizeof(message)-sizeof(message.mtype), getpid(), !IPC_NOWAIT)==-1 ) if(loggerOn) perror("Errror in receive");
+        if (msgrcv(sys_info.logger_msgqid, &message, sizeof(message)-sizeof(message.mtype), getpid(), !IPC_NOWAIT)==-1 ) if(loggerOn) perror("Errror in receive");
         //debugging
         //printf("0-----%d:  %d-%d = %d \n",message.sender,logger_shared_memory->producer_idx,logger_shared_memory->consumer_idx,current_number_of_produced);
     }
@@ -39,7 +39,7 @@ void MsgSystem(){
         message.mtype=message.sender;
         message.sender=getpid();
         //respond to the request (the client is waiting)
-        if (msgsnd(msgqid, &message, sizeof(message)-sizeof(message.mtype), !IPC_NOWAIT)==-1) perror("Errror in send");
+        if (msgsnd(sys_info.logger_msgqid, &message, sizeof(message)-sizeof(message.mtype), !IPC_NOWAIT)==-1) perror("Errror in send");
     
     }else if(message.acquire_sem==0)
     {
@@ -61,9 +61,9 @@ void Produce(char *msg){
     struct MsgBuff message={.mtype = sys_info.logger_pid , .sender = getpid() , .acquire_sem = 1};
     //send request to produce
     if(L_VERBOS) printf("Sending message to produce (logger) _%d\n", getpid());
-    if (msgsnd(msgqid, &message, sizeof(message)-sizeof(message.mtype), !IPC_NOWAIT)==-1) perror("Errror in send");
+    if (msgsnd(sys_info.logger_msgqid, &message, sizeof(message)-sizeof(message.mtype), !IPC_NOWAIT)==-1) perror("Errror in send");
     //wait for acceptance 
-    if (msgrcv(msgqid, &message, sizeof(message)-sizeof(message.mtype), getpid(), !IPC_NOWAIT)==-1 ) perror("Errror in receive");
+    if (msgrcv(sys_info.logger_msgqid, &message, sizeof(message)-sizeof(message.mtype), getpid(), !IPC_NOWAIT)==-1 ) perror("Errror in receive");
     if(L_VERBOS) printf("Confirmation received (logger) _%d\n", getpid());
     //entered critical section check if the queue is full
     logger_shared_memory->waiting_pid=getpid();
@@ -80,7 +80,7 @@ void Produce(char *msg){
     message.sender = getpid();
     message.acquire_sem = 0;
     //release the sem
-    if (msgsnd(msgqid, &message, sizeof(message)-sizeof(message.mtype), !IPC_NOWAIT)==-1) perror("Errror in send");
+    if (msgsnd(sys_info.logger_msgqid, &message, sizeof(message)-sizeof(message.mtype), !IPC_NOWAIT)==-1) perror("Errror in send");
     if(L_VERBOS) printf("Semaphore released _%d\n", getpid());
     kill(sys_info.logger_pid, SIGCONT);
     printf("prod-----:  %d-%d = %d \n",logger_shared_memory->producer_idx,logger_shared_memory->consumer_idx,current_number_of_produced);
@@ -122,7 +122,7 @@ void handler(int signum)
 	if (signum==SIGUSR1) loggerOn=0;
     printf("Parent terminating logger..\n");
     struct MsgBuff message={.mtype = sys_info.logger_pid , .sender = 0 , .acquire_sem = -1};
-    if (msgsnd(msgqid, &message, sizeof(message)-sizeof(message.mtype), !IPC_NOWAIT)==-1) perror("Errror in send");
+    if (msgsnd(sys_info.logger_msgqid, &message, sizeof(message)-sizeof(message.mtype), !IPC_NOWAIT)==-1) perror("Errror in send");
 }
 
 /*
