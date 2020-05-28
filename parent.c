@@ -109,8 +109,10 @@ void setup_processes()
     setup_msg[2].role = query_logger;
     setup_msg[3].role = deadlock_detector;
     for(int i = 4; i < num_forked; i++)
+    {
         setup_msg[i].role = db_client;
-
+        setup_msg[i].number = i-3;
+    }
     //Assign the pid to receive message from
     for(int i = 0; i < num_forked; i++)
         setup_msg[i].mtype = pids[i+1];
@@ -150,6 +152,10 @@ void receive_setup()
     sys_info = msg_buffer.sys_info;
     //Get the process role
     process_role = msg_buffer.role;
+    //If process is a client, assign the client number
+    if(process_role == db_client)
+        client_number = msg_buffer.number;
+    
 }
 
 /*

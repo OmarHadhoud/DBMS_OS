@@ -12,6 +12,7 @@ struct initializing_msg //The initializing message that contains system data.
     long mtype; //The receiver pid
     struct system_information sys_info;
     int role;
+    int number; //The client number
 };
 
 #endif /* _MESSAGES_H_ */

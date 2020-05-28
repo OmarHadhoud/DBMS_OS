@@ -24,10 +24,11 @@ key_t msgqid;
 //The pids of the processes forked.
 int *pids;
 int num_forked; //Number of forked processes
+//The client number
+int client_number;
 
 //The struct of system resources information needed by the processes
 //The resources needed are the records_shmid, logger_shmid,
-//TODO: query_logger pid (if not going to use shmid) and deadlock_detector
 struct system_information {
     int records_shmid; //The shared memory id of the records table.
     int logger_shmid; //The shared memory id of the logger.
