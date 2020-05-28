@@ -4,6 +4,7 @@
 #include "manager.h"
 #include "parent.h"
 #include "logger.h"
+#include "query_logger.h"
 
 //Definition of client process
 
