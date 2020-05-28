@@ -188,12 +188,18 @@ void parent_main()
     int stat_loc;
     while(num_forked != 0)
     {
-        wait(&stat_loc);
-        num_forked--;
-        printf("\nCurrent forks: %d\n",num_forked);
-        if (num_forked==1)
+        pid_t dead_process = wait(&stat_loc);
+        if(check_client(dead_process))
+            active_clients--;
+        printf("\nCurrent clients: %d\n",active_clients);
+        //If all clients are dead; i.e. system is done
+        if (active_clients==0)
         {
+            //Send signals to util processes to die.
             kill(sys_info.logger_pid, SIGUSR1);
+            kill(sys_info.query_logger_pid, SIGUSR1);
+            kill(sys_info.db_manager_pid, SIGUSR1);
+            kill(sys_info.deadlock_detector_pid, SIGUSR1);
         }
         
     }
@@ -202,4 +208,17 @@ void parent_main()
     //Free the shared memory we allocated
     shmctl(sys_info.records_shmid ,IPC_RMID, (struct shmid_ds*)0);
     shmctl(sys_info.logger_shmid ,IPC_RMID, (struct shmid_ds*)0);
+}
+
+/*
+ * Checks if pid is of a client or not.
+ */
+_Bool check_client(pid_t pid)
+{
+    //Loop on first 4 forked, which are not clients.
+    for(int i = 1; i < 5; i++)
+    {
+        if(pid == pids[i]) return 0; //PID is of manager, logger, query logger or deadlock detector.
+    }
+    return 1; //pid is of client
 }

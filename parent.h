@@ -26,6 +26,8 @@ int *pids;
 int num_forked; //Number of forked processes
 //The client number
 int client_number;
+//The number of active clients
+int active_clients;
 
 //The struct of system resources information needed by the processes
 //The resources needed are the records_shmid, logger_shmid,
@@ -50,6 +52,7 @@ struct system_information sys_info;
  * receive_setup: Receives the setup data (roles and resources) for forked processes.
  * process_main: The main process depending on the role
  * parent_main: The main of the parent process
+ * check_client: Checks if the pid given is a client or not.
  */
 
 int read_config();
@@ -59,5 +62,6 @@ void setup_processes();
 void receive_setup();
 void process_main();
 void parent_main();
+_Bool check_client(pid_t pid);
 
 #endif /* _PARENT_H_ */
