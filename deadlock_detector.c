@@ -7,4 +7,5 @@
 void deadlock_detector_main()
 {
     printf("I'm the deadlock_detector, my pid is : %d\n", getpid());
+    while(1){}
 }
