@@ -80,11 +80,9 @@ void fork_children(int n)
 void initialize_resources()
 {
     //Create the shared memory segment for records struct.
-    //TODO: Use sizeof(record_struct) instead when done
-    sys_info.records_shmid = shmget(IPC_PRIVATE,sizeof(int),0666|IPC_CREAT);
+    sys_info.records_shmid = shmget(IPC_PRIVATE,sizeof(struct record),0666|IPC_CREAT);
     
     //Create the shared memory segment for logger struct.
-    //TODO: Use sizeof(logger_struct) instead when done
     sys_info.logger_shmid = shmget(IPC_PRIVATE,sizeof(struct LoggerSharedMemory),0666|IPC_CREAT);
 
     //The first forked process is the db_manager, second is logger, third is query_logger,
@@ -195,4 +193,7 @@ void parent_main()
     }
     //Free memory we allocated for pids list
     free(pids);
+    //Free the shared memory we allocated
+    shmctl(sys_info.records_shmid ,IPC_RMID, (struct shmid_ds*)0);
+    shmctl(sys_info.logger_shmid ,IPC_RMID, (struct shmid_ds*)0);
 }
