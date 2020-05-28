@@ -14,6 +14,7 @@ void manager_main()
 {
     printf("I'm the manager, my pid is : %d\n", getpid());
     raise(SIGSTOP);
+    while(1){}
 }
 
 /*
@@ -22,7 +23,7 @@ void manager_main()
 void manager_add_record()
 {
     struct message buff;
-    int rec_val = msgrcv(msgqid, &buff, sizeof(buff.message_record), getpid(), 0);
+    int rec_val = msgrcv(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), getpid(), 0);
     if (rec_val == -1)
         perror("Error in recieve");
     
@@ -39,7 +40,7 @@ void manager_add_record()
     //return key to client
     buff.message_record.key = current_key++;
     buff.mtype = buff.pid;
-    int send_val = msgsnd(msgqid, &buff, sizeof(buff.message_record), 0);
+    int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), 0);
     if (send_val == -1)
         perror("Error in send");
     
@@ -53,7 +54,7 @@ void manager_add_record()
 void manager_modify()
 {
     struct message buff;
-    int rec_val = msgrcv(msgqid, &buff, sizeof(buff.message_record), getpid(), 0);
+    int rec_val = msgrcv(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), getpid(), 0);
     if (rec_val == -1)
         perror("Error in recieve");
 
@@ -68,7 +69,7 @@ void manager_modify()
 void manager_acquire()
 {
     struct message buff;
-    int rec_val = msgrcv(msgqid, &buff, sizeof(buff.message_record), getpid(), 0);
+    int rec_val = msgrcv(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), getpid(), 0);
     if (rec_val == -1)
         perror("Error in recieve");
 
@@ -82,7 +83,7 @@ void manager_acquire()
 void manager_release()
 {
    struct message buff;
-    int rec_val = msgrcv(msgqid, &buff, sizeof(buff.message_record), getpid(), 0);
+    int rec_val = msgrcv(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), getpid(), 0);
     if (rec_val == -1)
         perror("Error in recieve");
 
