@@ -45,6 +45,7 @@ int read_config()
 void fork_children(int n)
 {
     num_forked = n;
+    active_clients = n - 4; //The number of clients
     //Create the message queue to be passed to forked children to be 
     //able to communicate with them.
     msgqid = msgget(IPC_PRIVATE, 0644);
@@ -189,6 +190,7 @@ void parent_main()
     while(num_forked != 0)
     {
         pid_t dead_process = wait(&stat_loc);
+        num_forked--;
         if(check_client(dead_process))
             active_clients--;
         printf("\nCurrent clients: %d\n",active_clients);
