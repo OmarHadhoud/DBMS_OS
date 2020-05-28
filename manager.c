@@ -1,7 +1,7 @@
 #include "manager.h"
 
 
-
+int current_key = 0;
 
 /*
  * Manager functions.

@@ -31,7 +31,7 @@ struct message{
     int pid;
 };
 
-int current_key = 0;
+extern int current_key;
 struct record* manager_shm_record[1000];    //array of record pointers to attach in the shared memory.
 
 /*
