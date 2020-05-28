@@ -13,6 +13,8 @@
  */
 
 struct record* client_shm_record;
+//The name of the file to write queries in
+#define QUERY_LOGGER_FILE_NAME "queries.txt"
 
 
 
