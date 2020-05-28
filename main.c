@@ -1,5 +1,7 @@
 #include "parent.h"
 #include <stdio.h>
+#include <sys/signal.h>
+#include <sys/unistd.h>
 
 int main()
 {

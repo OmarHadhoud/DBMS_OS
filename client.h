@@ -3,6 +3,7 @@
 
 #include "manager.h"
 #include "parent.h"
+#include "logger.h"
 
 //Definition of client process
 

@@ -12,6 +12,9 @@
 #include <sys/shm.h>
 //To send initializing system messages.
 #include "messages.h"
+//To handle signals of children dying
+#include <sys/signal.h>
+#include <sys/wait.h>
 
 /*
  * Parent functions.
@@ -82,7 +85,7 @@ void initialize_resources()
     
     //Create the shared memory segment for logger struct.
     //TODO: Use sizeof(logger_struct) instead when done
-    sys_info.logger_shmid = shmget(IPC_PRIVATE,sizeof(int),0666|IPC_CREAT);
+    sys_info.logger_shmid = shmget(IPC_PRIVATE,sizeof(struct LoggerSharedMemory),0666|IPC_CREAT);
 
     //The first forked process is the db_manager, second is logger, third is query_logger,
     //Fourth is deadlock_detector, the rest are the db_clients.
@@ -177,4 +180,19 @@ void process_main()
 void parent_main()
 {
     printf("I'm the parent, my pid is : %d\n", getpid());
+    //Wait for all children to die then exit
+    int stat_loc;
+    while(num_forked != 0)
+    {
+        wait(&stat_loc);
+        num_forked--;
+        printf("\nCurrent forks: %d\n",num_forked);
+        if (num_forked==1)
+        {
+            kill(sys_info.logger_pid, SIGUSR1);
+        }
+        
+    }
+    //Free memory we allocated for pids list
+    free(pids);
 }
