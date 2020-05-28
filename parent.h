@@ -19,8 +19,6 @@
 //Enum for roles of processes
 enum role {parent, db_manager, db_client, logger, query_logger, deadlock_detector};
 enum role process_role; 
-//The message queue id
-key_t msgqid;
 //The pids of the processes forked.
 int *pids;
 int num_forked; //Number of forked processes
@@ -38,6 +36,9 @@ struct system_information {
     pid_t logger_pid;
     pid_t query_logger_pid;
     pid_t deadlock_detector_pid;
+    key_t logger_msgqid; //The message queue id for the logger
+    key_t query_logger_msgqid; //The message queue id for the query logger
+    key_t dbmanager_msgqid; //The message queue id for the db_manager
 };
 struct system_information sys_info;
 

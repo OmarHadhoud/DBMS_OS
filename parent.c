@@ -46,9 +46,11 @@ void fork_children(int n)
 {
     num_forked = n;
     active_clients = n - 4; //The number of clients
-    //Create the message queue to be passed to forked children to be 
+    //Create the message queues to be passed to forked children to be 
     //able to communicate with them.
-    msgqid = msgget(IPC_PRIVATE, 0644);
+    sys_info.query_logger_msgqid = msgget(IPC_PRIVATE, 0644);
+    sys_info.logger_msgqid = msgget(IPC_PRIVATE, 0644);
+    sys_info.dbmanager_msgqid = msgget(IPC_PRIVATE, 0644);
 
     //Allocate memory for array of pids for parent process
     pids = (pid_t*) malloc((n+1)*sizeof(pid_t));
@@ -122,7 +124,7 @@ void setup_processes()
     int sz = sizeof(setup_msg[0]) - sizeof(setup_msg[0].mtype); //The size of the message
     for(int i = 0; i < num_forked; i++)
     {
-        int send_val = msgsnd(msgqid, &setup_msg[i], sz, 0);
+        int send_val = msgsnd(sys_info.dbmanager_msgqid, &setup_msg[i], sz, 0);
         if(send_val == -1)
         {
             perror("Couldn't send initializing messages!");
@@ -140,12 +142,12 @@ void receive_setup()
     int sz = sizeof(msg_buffer) - sizeof(msg_buffer.mtype); //The size of the message
     
     //Receive the initialzing message
-    int rec_val = msgrcv(msgqid, &msg_buffer, sz, getpid(),0);
+    int rec_val = msgrcv(sys_info.dbmanager_msgqid, &msg_buffer, sz, getpid(),0);
     
     //If can't receive message
     if(rec_val == -1)
     {
-        perror("COuldn't receive tht initializing message");
+        perror("Couldn't receive tht initializing message");
         exit(-1);
     }
 
@@ -193,23 +195,30 @@ void parent_main()
         num_forked--;
         if(check_client(dead_process))
             active_clients--;
-        printf("\nCurrent clients: %d\n",active_clients);
+        printf("\nCurrent clients: %d\n",active_clients > 0 ? active_clients : 0);
         //If all clients are dead; i.e. system is done
         if (active_clients==0)
         {
             //Send signals to util processes to die.
-            kill(sys_info.logger_pid, SIGUSR1);
             kill(sys_info.query_logger_pid, SIGUSR1);
-            kill(sys_info.db_manager_pid, SIGUSR1);
-            kill(sys_info.deadlock_detector_pid, SIGUSR1);
+            //TODO: change to SIGUSR1
+            kill(sys_info.db_manager_pid, SIGCONT); //TODO: Remove this, for now it used until done by messages
+            kill(sys_info.db_manager_pid, SIGTERM);
+            kill(sys_info.deadlock_detector_pid, SIGTERM);
+            sleep(2); //Leave time to logger to log every process dying
+            kill(sys_info.logger_pid, SIGUSR1);
+            active_clients--; //To prevent entering this loop again
         }
-        
     }
     //Free memory we allocated for pids list
     free(pids);
     //Free the shared memory we allocated
     shmctl(sys_info.records_shmid ,IPC_RMID, (struct shmid_ds*)0);
     shmctl(sys_info.logger_shmid ,IPC_RMID, (struct shmid_ds*)0);
+    //Close opened message queues
+    msgctl(sys_info.query_logger_msgqid,IPC_RMID,(struct msqid_ds*)0);
+    msgctl(sys_info.dbmanager_msgqid,IPC_RMID,(struct msqid_ds*)0);
+    msgctl(sys_info.logger_msgqid,IPC_RMID,(struct msqid_ds*)0);
 }
 
 /*
