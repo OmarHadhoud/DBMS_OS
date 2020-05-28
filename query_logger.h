@@ -6,7 +6,7 @@
 //To use pid_t
 #include <sys/types.h>
 //The semaphore of the query logger file
-struct Sem sem;
+struct Sem query_sem;
 //Boolean indicating if query logger is on
 int query_logger_on; 
 
