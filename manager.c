@@ -13,6 +13,7 @@ int current_key = 0;
 void manager_main()
 {
     printf("I'm the manager, my pid is : %d\n", getpid());
+    manager_shared_memory = (struct ManagerSharedMemory*) shmat(sys_info.records_shmid,NULL,0);
     raise(SIGSTOP);
     while(1){}
 }
@@ -23,11 +24,11 @@ void manager_main()
 void manager_add_record()
 {
     struct message buff;
+    struct record** manager_shm_record = manager_shared_memory->records;
     int rec_val = msgrcv(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), getpid(), 0);
     if (rec_val == -1)
         perror("Error in recieve");
     
-    manager_shm_record[current_key] = (struct record*) shmat(sys_info.records_shmid,(void*)0,0);    //attach to shared memory
     manager_shm_record[current_key] -> key = current_key;
     manager_shm_record[current_key] -> salary = buff.message_record.salary;   
     for(int i = 0; i<=20; i++)
@@ -54,6 +55,7 @@ void manager_add_record()
 void manager_modify()
 {
     struct message buff;
+    struct record** manager_shm_record = manager_shared_memory->records;
     int rec_val = msgrcv(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), getpid(), 0);
     if (rec_val == -1)
         perror("Error in recieve");
@@ -69,6 +71,7 @@ void manager_modify()
 void manager_acquire()
 {
     struct message buff;
+    struct record** manager_shm_record = manager_shared_memory->records;
     int rec_val = msgrcv(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), getpid(), 0);
     if (rec_val == -1)
         perror("Error in recieve");
@@ -83,6 +86,7 @@ void manager_acquire()
 void manager_release()
 {
    struct message buff;
+    struct record** manager_shm_record = manager_shared_memory->records;
     int rec_val = msgrcv(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), getpid(), 0);
     if (rec_val == -1)
         perror("Error in recieve");

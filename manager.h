@@ -30,9 +30,12 @@ struct message{
     struct record message_record;
     int pid;
 };
+struct ManagerSharedMemory{
+    struct record records[1000];
+};
+struct ManagerSharedMemory *manager_shared_memory;
 
 extern int current_key;
-struct record* manager_shm_record[1000];    //array of record pointers to attach in the shared memory.
 
 /*
  * manager process functions.
