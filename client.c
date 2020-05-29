@@ -117,16 +117,20 @@ void select_all()
     //Critical section, write to file the records directly
     //Open file to append in
     FILE *F = fopen(QUERY_LOGGER_FILE_NAME, "a");
+    Produce("Opened the query logger file to append to it my queries.\n");
     if (F == NULL)
         perror("Couldn't create file");
     struct record *rec = client_shm_records;
+    fprintf("I'm process %d and this is the output of my select all query:\n", getpid());
     for (int i = 0; i < 1000; i++)
     {
-        printf("%d\t%c\t%d\n", rec->key, rec->name, rec->salary);
+        fprintf("%d\t%s\t%d\n", rec->key, rec->name, rec->salary);
         fflush(F);
     }
+    Produce("Printed the queries!\n");
     //Close the file after writing and release the lock
     fclose(F);
+    Produce("Closed the query logger file after appending my queries");
     release_query_logger_sem();
 }
 
@@ -138,19 +142,23 @@ void select_name(char *name, int exact)
     acquire_query_logger_sem();
     //Critical section, write to file the records directly
     //Open file to append in
+    Produce("Opened the query logger file to append to it my queries.\n");
     FILE *F = fopen(QUERY_LOGGER_FILE_NAME, "a");
     if (F == NULL)
         perror("Couldn't create file");
     struct record *rec = client_shm_records;
+    fprintf("I'm process %d and this is the output of my select name %s, and exact : %d:\n", getpid(), name, exact);
     for (int i = 0; i < 1000; i++)
     {
         if (!check_name(rec->name,name,exact))
             continue;
-        printf("%d\t%c\t%d\n", rec->key, rec->name, rec->salary);
+        fprintf("%d\t%s\t%d\n", rec->key, rec->name, rec->salary);
         fflush(F);
     }
+    Produce("Printed the queries!\n");
     //Close the file after writing and release the lock
     fclose(F);
+    Produce("Closed the query logger file after appending my queries");
     release_query_logger_sem();
 }
 
@@ -162,20 +170,24 @@ void select_salary(int salary, int mode)
     acquire_query_logger_sem();
     //Critical section, write to file the records directly
     //Open file to append in
+    Produce("Opened the query logger file to append to it my queries.\n");
     FILE *F = fopen(QUERY_LOGGER_FILE_NAME, "a");
     if (F == NULL)
         perror("Couldn't create file");
     struct record *rec = client_shm_records;
+    fprintf("I'm process %d and this is the output of my select salary %s, and mode : %d:\n", getpid(), salary, mode);
     for (int i = 0; i < 1000; i++)
     {
         if (!check_salary(rec->salary,salary,mode))
             continue;
 
-        printf("%d\t%c\t%d\n", rec->key, rec->name, rec->salary);
+        fprintf("%d\t%s\t%d\n", rec->key, rec->name, rec->salary);
         fflush(F);
     }
+    Produce("Printed the queries!\n");
     //Close the file after writing and release the lock
     fclose(F);
+    Produce("Closed the query logger file after appending my queries");
     release_query_logger_sem();
 }
 
@@ -187,20 +199,24 @@ void select_hybrid(char *name, int salary, int mode, int exact)
     acquire_query_logger_sem();
     //Critical section, write to file the records directly
     //Open file to append in
+    Produce("Opened the query logger file to append to it my queries.\n");
     FILE *F = fopen(QUERY_LOGGER_FILE_NAME, "a");
     if (F == NULL)
         perror("Couldn't create file");
     struct record *rec = client_shm_records;
+    fprintf("I'm process %d and this is the output of my select hybrid, name:  %s, and exact : %d, salary: %d, mode: %d:\n", getpid(), name, exact, salary, mode);
     for (int i = 0; i < 1000; i++)
     {
         if (check_name(rec->name, name, exact) == 0 || check_salary(rec->salary, salary, mode) == 0)
             continue;
 
-        printf("%d\t%c\t%d\n", rec->key, rec->name, rec->salary);
+        fprintf("%d\t%s\t%d\n", rec->key, rec->name, rec->salary);
         fflush(F);
     }
+    Produce("Printed the queries!\n");
     //Close the file after writing and release the lock
     fclose(F);
+    Produce("Closed the query logger file after appending my queries");
     release_query_logger_sem();
 }
 
@@ -209,7 +225,6 @@ void select_hybrid(char *name, int salary, int mode, int exact)
  */
 _Bool check_name(char *real_name, char *name, int exact)
 {
-
     if (exact == 1 && strcmp(name, real_name) != 0)
         return 0;
     if (exact == 0)
