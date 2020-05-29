@@ -12,6 +12,8 @@
 void client_main()
 {
     printf("I'm the client, my pid is : %d\n", getpid());
+    //Get the db shared memory as read-only for queries
+    client_shm_record = (struct record*) shmat(sys_info.records_shmid,NULL,SHM_RDONLY);
     char *msg="help me please";
     char *msg2="help me more";
     logger_shared_memory = (struct LoggerSharedMemory*) shmat(sys_info.logger_shmid,NULL,0);
@@ -19,6 +21,9 @@ void client_main()
     Produce(msg2);
     acquire_query_logger_sem();
     release_query_logger_sem();
+    //Detach shared memory segments
+    shmdt(client_shm_record);
+    shmdt(logger_shared_memory);
 }
 
 /*
@@ -83,9 +88,7 @@ void client_acquire(int key)
         perror("Error in send");
 
     kill(sys_info.db_manager_pid,SIGCONT);
-    raise(SIGSTOP);
-    
-    client_shm_record = (struct record*) shmat(sys_info.records_shmid,(void*)0,0);
+    raise(SIGSTOP);    
 }
 
 /*
@@ -103,7 +106,4 @@ void client_release(int key)
 
     kill(sys_info.db_manager_pid,SIGCONT); 
     raise(SIGSTOP);
-    
-    shmdt(client_shm_record);
 }
-
