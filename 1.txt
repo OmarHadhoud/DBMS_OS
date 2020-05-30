@@ -1,0 +1,5 @@
+add ahmed 5000 5
+acquire 1   
+modify 1 500
+sleep 2
+release 1

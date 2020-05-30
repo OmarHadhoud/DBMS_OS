@@ -1,7 +1,9 @@
 #include "client.h"
-
 #include <stdio.h>
 #include <string.h>
+
+
+
 
 /*
  * Client functions.
@@ -20,6 +22,23 @@ void client_main()
     logger_shared_memory = (struct LoggerSharedMemory *)shmat(sys_info.logger_shmid, NULL, 0);
     Produce(msg);
     Produce(msg2);
+    if(client_number==1)
+    {
+      read_config_client("1.txt");
+    }
+    else if(client_number==2)
+    {
+        read_config_client("2.txt");
+    }
+    else if(client_number==3)
+    {
+      read_config_client("3.txt");
+    }
+    else if(client_number==4)
+    {
+         read_config_client("4.txt");
+    }
+    
     acquire_query_logger_sem();
     release_query_logger_sem();
     //Detach shared memory segments
@@ -251,4 +270,139 @@ _Bool check_salary(int real_salary, int salary, int mode)
     if (mode == 4 && !(real_salary <= salary))
         return 0;
     return 1;
+}
+/*
+read configuration file and make operations in configuration file 
+*/
+void read_config_client(char file_name[])
+{
+            FILE * file_pointer;
+      file_pointer = fopen(file_name, "r");
+      char operation_type[8] ;
+   while(fscanf(file_pointer,"%s", operation_type) != EOF)
+{
+        printf("----read and parse data----\n");
+         //reset the pointer
+        char name[20];
+        int salary  ;
+        int key ;
+
+         char add[]= "add" ;
+         char modify[]= "modify" ;
+         char acquire []= "acquire" ;
+         char release[]= "release" ;
+         char query[]= "query" ;
+         char sleep_type[] = "sleep";
+
+          if(strcmp(operation_type, add) == 0)
+            {
+               printf("%s ", operation_type);    
+            	fscanf(file_pointer,"%s",name);
+	        fscanf(file_pointer,"%d",&salary);
+                 fscanf(file_pointer,"%d",&key);
+            client_add_record(name,salary,key);
+            }
+          
+         if(strcmp(operation_type, modify) == 0)
+            {
+           	fscanf(file_pointer,"%d",&key);
+	        fscanf(file_pointer,"%d",&salary);
+            client_modify(key,salary);
+            }        
+
+         if(strcmp(operation_type, acquire) == 0)
+            {
+           	fscanf(file_pointer,"%d",&key);
+            client_acquire(key) ;
+            }
+         
+          if(strcmp(operation_type, release) == 0)
+            {
+                printf("%s ", operation_type);
+           	fscanf(file_pointer,"%d",&key);
+	        printf("%d \n", key);
+            client_release(key);
+            }
+           if(strcmp(operation_type,sleep_type) == 0)
+            {
+                printf("%s ", operation_type);
+           	fscanf(file_pointer,"%d",&key);
+	        printf("%d \n", key);
+                sleep(key);
+            } 
+            if(strcmp(operation_type,query) == 0)
+	    {
+		        char type[8];
+		        char name_type[] = "name" ;
+		        char salary_type[] = "salary" ;
+		        
+		   	fscanf(file_pointer,"%s",type);
+		        if(strcmp(type,name_type) == 0)
+		        {
+		        fscanf(file_pointer,"%s",name);
+		        printf("%s ", operation_type);
+			printf("%s ", type);
+		        printf("%s \n", name);
+		        }
+		       
+
+
+
+              if(strcmp(type,salary_type) == 0)
+		{
+		        char operator_type[4];
+		        char operator_1[]="=";
+		        char operator_2[]=">";
+		        char operator_3[]="<";
+		        char operator_4[]=">=";
+		        char operator_5[]="=<";      
+		        fscanf(file_pointer,"%s",operator_type); 
+		        fscanf(file_pointer,"%d",&salary);
+		        if(strcmp(operator_type,operator_1) == 0)
+		         { 
+		            fscanf(file_pointer,"%d",&salary);
+		             printf("%s", operation_type);
+			     printf("%s", type);
+		             printf("%s", operator_type);
+		             printf("%d\n", salary);
+		          }
+		        if(strcmp(operator_type,operator_2) == 0)
+		         { 
+		            fscanf(file_pointer,"%d",&salary);
+		             printf("%s", operation_type);
+			     printf("%s", type);
+		             printf("%s", operator_type);
+		             printf("%d\n", salary);
+		          }
+ 		        if(strcmp(operator_type,operator_3) == 0)
+		         { 
+		            fscanf(file_pointer,"%d",&salary);
+		             printf("%s", operation_type);
+			     printf("%s", type);
+		             printf("%s", operator_type);
+		             printf("%d\n", salary);
+		          }
+		        if(strcmp(operator_type,operator_4) == 0)
+		         { 
+		            fscanf(file_pointer,"%d",&salary);
+		             printf("%s", operation_type);
+			     printf("%s", type);
+		             printf("%s", operator_type);
+		             printf("%d\n", salary);
+		          }
+		        if(strcmp(operator_type,operator_5) == 0)
+		         { 
+		            fscanf(file_pointer,"%d",&salary);
+		             printf("%s", operation_type);
+			     printf("%s", type);
+		             printf("%s", operator_type);
+		             printf("%d\n", salary);
+		          }
+		     }  
+            
+               }   
+   
+}
+        fclose(file_pointer);
+
 }

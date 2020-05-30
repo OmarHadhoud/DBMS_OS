@@ -1,0 +1,4 @@
+add mohamed 200 2
+acquire 1   
+sleep 2
+release 1
