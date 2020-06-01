@@ -1,7 +1,16 @@
 #include "client.h"
-
 #include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/msg.h>
+//To use shared memory
+#include <sys/ipc.h>
+#include <sys/shm.h>
+//To use signals
+#include <signal.h>
+#include <string.h>
+
+
 
 /*
  * Client functions.
@@ -12,14 +21,37 @@
  */
 void client_main()
 {
-    printf("I'm the client, my pid is : %d\n", getpid());
+    
     //Get the db shared memory as read-only for queries
-    client_shm_records = (struct ManagerSharedMemory *)shmat(sys_info.records_shmid, NULL, SHM_RDONLY);
+    manager_shared_memory = (struct ManagerSharedMemory *)shmat(sys_info.records_shmid, NULL, SHM_RDONLY);
     char *msg = "help me please";
     char *msg2 = "help me more";
     logger_shared_memory = (struct LoggerSharedMemory *)shmat(sys_info.logger_shmid, NULL, 0);
-    Produce(msg);
-    Produce(msg2);
+    //Produce(msg);
+    //Produce(msg2);
+    if(client_number==1)
+    {
+    //  client_add_record("ahmed",4000,5);
+      
+      read_config_client("1.txt");
+    if(manager_shared_memory)
+    printf("salary in record 1 = %d\n", manager_shared_memory->records[0].salary) ;
+
+    }
+
+   // else if(client_number==2)
+   // {
+     //   read_config_client("2.txt");
+   // }
+   // else if(client_number==3)
+   // {
+     // read_config_client("3.txt");
+   // }
+   // else if(client_number==4)
+   // {
+     //    read_config_client("4.txt");
+   // }
+    
     acquire_query_logger_sem();
     release_query_logger_sem();
     //Detach shared memory segments
@@ -32,28 +64,29 @@ void client_main()
  */
 void client_add_record(char name[20], int salary, int key)
 {
+    
     struct message buff;
     buff.mtype = sys_info.db_manager_pid;
     buff.message_record.key = key;
     buff.message_record.salary = salary;
+    buff.type_operation = 1;
     buff.pid = getpid();
+    
     for (int i = 0; i <= 20; i++)
     {
         if (name[i] >= 'a' && name[i] <= 'z')
             buff.message_record.name[i] = name[i];
     }
-    int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), 0);
+    int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff), !IPC_NOWAIT);
     if (send_val == -1)
         perror("Error in send");
-
-    kill(sys_info.db_manager_pid, SIGCONT);
-    raise(SIGSTOP);
-
-    int rec_val = msgrcv(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), getpid(), 0);
+    printf("I am Client my pid is = %d and I added record \n",getpid());
+    int rec_val = msgrcv(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), getpid(), !IPC_NOWAIT);
     if (rec_val == -1)
         perror("Error in recieve");
 
     key = buff.message_record.key;
+     printf("the new key is = %d\n",key);
 }
 
 /*
@@ -64,9 +97,10 @@ void client_modify(int key, int value)
     struct message buff;
     buff.mtype = sys_info.db_manager_pid;
     buff.message_record.key = key;
+    buff.type_operation =2;
     buff.message_record.salary = value;
     buff.pid = getpid();
-    int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), 0);
+    int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff), !IPC_NOWAIT);
     if (send_val == -1)
         perror("Error in send");
 
@@ -251,4 +285,139 @@ _Bool check_salary(int real_salary, int salary, int mode)
     if (mode == 4 && !(real_salary <= salary))
         return 0;
     return 1;
+}
+/*
+read configuration file and make operations in configuration file 
+*/
+void read_config_client(char file_name[])
+{
+            FILE * file_pointer;
+            
+      file_pointer = fopen(file_name, "r");
+      char operation_type[8] ;
+   while(fscanf(file_pointer,"%s", operation_type) != EOF)
+{
+         //reset the pointer
+        char name[20];
+        int salary  ;
+        int key ;
+
+         char add[]= "add" ;
+         char modify[]= "modify" ;
+         char acquire []= "acquire" ;
+         char release[]= "release" ;
+         char query[]= "query" ;
+         char sleep_type[] = "sleep";
+
+          if(strcmp(operation_type, add) == 0)
+            {
+               printf("%s ", operation_type);    
+            	fscanf(file_pointer,"%s",name);
+	        fscanf(file_pointer,"%d",&salary);
+                 fscanf(file_pointer,"%d",&key);
+            client_add_record(name,salary,key);
+            }
+          
+         if(strcmp(operation_type, modify) == 0)
+            {
+           	fscanf(file_pointer,"%d",&key);
+	        fscanf(file_pointer,"%d",&salary);
+            client_modify(key,salary);
+            }        
+
+         if(strcmp(operation_type, acquire) == 0)
+            {
+           	fscanf(file_pointer,"%d",&key);
+            client_acquire(key) ;
+            }
+         
+          if(strcmp(operation_type, release) == 0)
+            {
+                printf("%s ", operation_type);
+           	fscanf(file_pointer,"%d",&key);
+	        printf("%d \n", key);
+            client_release(key);
+            }
+           if(strcmp(operation_type,sleep_type) == 0)
+            {
+                printf("%s ", operation_type);
+           	fscanf(file_pointer,"%d",&key);
+	        printf("%d \n", key);
+                sleep(key);
+            } 
+            if(strcmp(operation_type,query) == 0)
+	    {
+		        char type[8];
+		        char name_type[] = "name" ;
+		        char salary_type[] = "salary" ;
+		        
+		   	fscanf(file_pointer,"%s",type);
+		        if(strcmp(type,name_type) == 0)
+		        {
+		        fscanf(file_pointer,"%s",name);
+		        printf("%s ", operation_type);
+			printf("%s ", type);
+		        printf("%s \n", name);
+		        }
+		       
+
+
+
+              if(strcmp(type,salary_type) == 0)
+		{
+		        char operator_type[4];
+		        char operator_1[]="=";
+		        char operator_2[]=">";
+		        char operator_3[]="<";
+		        char operator_4[]=">=";
+		        char operator_5[]="=<";      
+		        fscanf(file_pointer,"%s",operator_type); 
+		        fscanf(file_pointer,"%d",&salary);
+		        if(strcmp(operator_type,operator_1) == 0)
+		         { 
+		            fscanf(file_pointer,"%d",&salary);
+		             printf("%s", operation_type);
+			     printf("%s", type);
+		             printf("%s", operator_type);
+		             printf("%d\n", salary);
+		          }
+		        if(strcmp(operator_type,operator_2) == 0)
+		         { 
+		            fscanf(file_pointer,"%d",&salary);
+		             printf("%s", operation_type);
+			     printf("%s", type);
+		             printf("%s", operator_type);
+		             printf("%d\n", salary);
+		          }
+ 		        if(strcmp(operator_type,operator_3) == 0)
+		         { 
+		            fscanf(file_pointer,"%d",&salary);
+		             printf("%s", operation_type);
+			     printf("%s", type);
+		             printf("%s", operator_type);
+		             printf("%d\n", salary);
+		          }
+		        if(strcmp(operator_type,operator_4) == 0)
+		         { 
+		            fscanf(file_pointer,"%d",&salary);
+		             printf("%s", operation_type);
+			     printf("%s", type);
+		             printf("%s", operator_type);
+		             printf("%d\n", salary);
+		          }
+		        if(strcmp(operator_type,operator_5) == 0)
+		         { 
+		            fscanf(file_pointer,"%d",&salary);
+		             printf("%s", operation_type);
+			     printf("%s", type);
+		             printf("%s", operator_type);
+		             printf("%d\n", salary);
+		          }
+		     }  
+            
+               }   
+   
+}
+        fclose(file_pointer);
+
 }

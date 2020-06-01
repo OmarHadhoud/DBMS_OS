@@ -83,7 +83,7 @@ void Produce(char *msg){
     if (msgsnd(sys_info.logger_msgqid, &message, sizeof(message)-sizeof(message.mtype), !IPC_NOWAIT)==-1) perror("Errror in send");
     if(L_VERBOS) printf("Semaphore released _%d\n", getpid());
     kill(sys_info.logger_pid, SIGCONT);
-    printf("prod-----:  %d-%d = %d \n",logger_shared_memory->producer_idx,logger_shared_memory->consumer_idx,current_number_of_produced);
+  //  printf("prod-----:  %d-%d = %d \n",logger_shared_memory->producer_idx,logger_shared_memory->consumer_idx,current_number_of_produced);
 }
 /*
  *  Finds logs sent by other processes and logs them in their corresponding file
@@ -96,7 +96,7 @@ int Consume(){
         if (current_number_of_produced) if(L_VERBOS) printf("\n Didn't consume %d\n", current_number_of_produced);
         return 1;
     } //no logs to consume
-    printf("cons-----:  %d-%d = %d \n",logger_shared_memory->producer_idx,logger_shared_memory->consumer_idx,current_number_of_produced);
+  //  printf("cons-----:  %d-%d = %d \n",logger_shared_memory->producer_idx,logger_shared_memory->consumer_idx,current_number_of_produced);
     
     // adding logs
     log = logger_shared_memory->logs_array[(logger_shared_memory->consumer_idx+1)%MEM_SIZE];

@@ -11,24 +11,26 @@
 #include <stdio.h> 
 #include <unistd.h>
 #include <sys/mman.h>
-
+//To use pid_t
+#include <sys/types.h>
 //Definition of manager process
 
 /*
  * Process variables and structs.  
  */
 
-
 struct record{
     int key;
     char name[20];
     int salary;
-    struct Sem* sem;
+   struct Sem  *sem1;
 };
+  // struct Sem sem1;
 struct message{
     long mtype;
     struct record message_record;
     int pid;
+    int type_operation;
 };
 struct ManagerSharedMemory{
     struct record records[1000];
@@ -48,10 +50,10 @@ extern int current_key;
  */
 
 void manager_main();
-void manager_add_record();
+void manager_add_record(char name[20], int salary,int pid);
 void manager_modify();
 void manager_acquire();
 void manager_release();
-
+void check_operation();
 
 #endif /* _MANAGER_H_ */

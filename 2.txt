@@ -1,0 +1,2 @@
+add omar 5000 3
+modify 1 500

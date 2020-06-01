@@ -42,7 +42,7 @@ void select_all();
 void select_name(char *name, int exact);
 void select_salary(int salary, int mode);
 void select_hybrid(char *name, int salary, int mode, int exact);
-
+void read_config_client(char file_name[]);
 _Bool check_name(char* real_name, char *name, int exact);
 _Bool check_salary(int real_salary, int salary, int mode);
 
