@@ -51,9 +51,6 @@ void client_main()
     // {
     //    read_config_client("4.txt");
     // }
-
-    acquire_query_logger_sem();
-    release_query_logger_sem();
     //Detach shared memory segments
     shmdt(manager_shared_memory);
     shmdt(logger_shared_memory);
@@ -149,7 +146,7 @@ void select_all()
     //Critical section, write to file the records directly
     //Open file to append in
     FILE *F = fopen(QUERY_LOGGER_FILE_NAME, "a");
-    //Produce("Opened the query logger file to append to it my queries.\n");
+    Produce("Opened the query logger file to append to it my queries.\n");
     if (F == NULL)
         perror("Couldn't create file");
     fprintf(F, "I'm process %d and this is the output of my select all query:\n", getpid());
@@ -158,11 +155,11 @@ void select_all()
     {
         fprintf(F, "%d\t\t\t%s\t\t\t%d\n", manager_shared_memory->records[i].key, manager_shared_memory->records[i].name, manager_shared_memory->records[i].salary);
     }
-    //Produce("Printed the queries!\n");
+    Produce("Printed the queries!\n");
     //Close the file after writing and release the lock
     fflush(F);
     fclose(F);
-    //Produce("Closed the query logger file after appending my queries");
+    Produce("Closed the query logger file after appending my queries");
     release_query_logger_sem();
 }
 
@@ -174,7 +171,7 @@ void select_name(char *name, int exact)
     acquire_query_logger_sem();
     //Critical section, write to file the records directly
     //Open file to append in
-    // Produce("Opened the query logger file to append to it my queries.\n");
+    Produce("Opened the query logger file to append to it my queries.\n");
     FILE *F = fopen(QUERY_LOGGER_FILE_NAME, "a");
     if (F == NULL)
         perror("Couldn't create file");
@@ -186,11 +183,11 @@ void select_name(char *name, int exact)
             continue;
         fprintf(F, "%d\t\t\t%s\t\t\t%d\n", manager_shared_memory->records[i].key, manager_shared_memory->records[i].name, manager_shared_memory->records[i].salary);
     }
-    //Produce("Printed the queries!\n");
+    Produce("Printed the queries!\n");
     //Close the file after writing and release the lock
     fflush(F);
     fclose(F);
-    //Produce("Closed the query logger file after appending my queries");
+    Produce("Closed the query logger file after appending my queries");
     release_query_logger_sem();
 }
 
@@ -202,7 +199,7 @@ void select_salary(int salary, int mode)
     acquire_query_logger_sem();
     //Critical section, write to file the records directly
     //Open file to append in
-    //  Produce("Opened the query logger file to append to it my queries.\n");
+    Produce("Opened the query logger file to append to it my queries.\n");
     FILE *F = fopen(QUERY_LOGGER_FILE_NAME, "a");
     if (F == NULL)
         perror("Couldn't create file");
@@ -215,11 +212,11 @@ void select_salary(int salary, int mode)
 
         fprintf(F, "%d\t\t\t%s\t\t\t%d\n", manager_shared_memory->records[i].key, manager_shared_memory->records[i].name, manager_shared_memory->records[i].salary);
     }
-    // Produce("Printed the queries!\n");
+    Produce("Printed the queries!\n");
     //Close the file after writing and release the lock
     fflush(F);
     fclose(F);
-    //Produce("Closed the query logger file after appending my queries");
+    Produce("Closed the query logger file after appending my queries");
     release_query_logger_sem();
 }
 
@@ -231,7 +228,7 @@ void select_hybrid(char *name, int salary, int mode, int exact)
     acquire_query_logger_sem();
     //Critical section, write to file the records directly
     //Open file to append in
-    //Produce("Opened the query logger file to append to it my queries.\n");
+    Produce("Opened the query logger file to append to it my queries.\n");
     FILE *F = fopen(QUERY_LOGGER_FILE_NAME, "a");
     if (F == NULL)
         perror("Couldn't create file");
@@ -244,11 +241,11 @@ void select_hybrid(char *name, int salary, int mode, int exact)
 
         fprintf(F, "%d\t\t\t%s\t\t\t%d\n", manager_shared_memory->records[i].key, manager_shared_memory->records[i].name, manager_shared_memory->records[i].salary);
     }
-    //Produce("Printed the queries!\n");
+    Produce("Printed the queries!\n");
     //Close the file after writing and release the lock
     fflush(F);
     fclose(F);
-    //Produce("Closed the query logger file after appending my queries");
+    Produce("Closed the query logger file after appending my queries");
     release_query_logger_sem();
 }
 

@@ -2,3 +2,7 @@ sleep 2
 add ibrahim 3000 2
 add sayed 8000 20
 modify 0 -1000
+query name starts_with ib
+query salary > 4000
+sleep 30
+add bigboss 100000
