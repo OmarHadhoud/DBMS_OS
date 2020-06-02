@@ -1,4 +1,10 @@
+query name exact sayed
+query salary <= 3000
 sleep 3
+query salary > 1000
 acquire 1
 sleep 12
 release 1
+query salary >= 90000
+sleep 30
+query salary >= 90000
