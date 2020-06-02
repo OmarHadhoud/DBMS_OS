@@ -7,6 +7,8 @@
 //To use signals
 #include <signal.h>
 #include <string.h>
+//To allocate and free memory we need stdlib.
+#include <stdlib.h>
 
 int current_key = 0;
 

@@ -343,9 +343,17 @@ void read_config_client(char file_name[])
             char type[8];
             char name_type[] = "name";
             char salary_type[] = "salary";
+            char select_type[] = "select";
             char exact_mode[] = "exact";
+            char hybrid_mode[] = "hybrid";
             char starts_with_mode[] = "starts_with";
             char exact[12];
+            char operator_type[4];
+            char operator_1[] = "=";
+            char operator_2[] = ">";
+            char operator_3[] = "<";
+            char operator_4[] = ">=";
+            char operator_5[] = "=<";
 
             fscanf(file_pointer, "%s", type);
             if (strcmp(type, name_type) == 0)
@@ -361,15 +369,121 @@ void read_config_client(char file_name[])
                 else if (!strcmp(exact, starts_with_mode))
                     select_name(name, 0);
             }
+            
+            if (strcmp(type, select_type) == 0)
+            {
+                char all_data[5] ;
+                fscanf(file_pointer, "%s", all_data);
+                printf("%s ", operation_type);
+                printf("%s ", type);
+                printf("%s \n", all_data);
+                //Todo----------------------------- 
+            }
+            if (strcmp(type, hybrid_mode) == 0)
+            {
+                char hybrid_name[8] ;
+                char hybrid_salary[8];
+                char hybrid_operator[3];
+                fscanf(file_pointer, "%s", hybrid_name);
+                fscanf(file_pointer, "%s", exact);
+                fscanf(file_pointer, "%s", name);
+                fscanf(file_pointer, "%s", hybrid_salary);
+                fscanf(file_pointer, "%s", hybrid_operator);
+                fscanf(file_pointer, "%d", &salary);
+                if (strcmp(hybrid_operator, operator_1) == 0)
+                {
+                    fscanf(file_pointer, "%d", &salary);
+                    printf("%s ", operation_type);
+                    printf("%s ", type);
+                    printf("%s ", hybrid_name);
+                    printf("%s ", exact);
+                    printf("%s ", name);
+                    printf("%s ", hybrid_salary);
+                    printf("%s ", hybrid_operator);
+                    printf(" %d\n", salary);
+                 //Todo-----------------------------
+                /*if (!strcmp(exact, exact_mode))
+                     //Todo-----------------------------
+                else if (!strcmp(exact, starts_with_mode))
+                    //Todo-----------------------------*/
+
+                }
+                if (strcmp(hybrid_operator, operator_2) == 0)
+                {
+                    fscanf(file_pointer, "%d", &salary);
+                    printf("%s ", operation_type);
+                    printf("%s ", type);
+                    printf("%s ", hybrid_name);
+                    printf("%s ", exact);
+                    printf("%s ", name);
+                    printf("%s ", hybrid_salary);
+                    printf("%s ", hybrid_operator);
+                    printf(" %d\n", salary);
+                 //Todo-----------------------------
+                /*if (!strcmp(exact, exact_mode))
+                     //Todo-----------------------------
+                else if (!strcmp(exact, starts_with_mode))
+                    //Todo-----------------------------*/                
+                }
+                if (strcmp(hybrid_operator, operator_3) == 0)
+                {
+                    fscanf(file_pointer, "%d", &salary);
+                    printf("%s ", operation_type);
+                    printf("%s ", type);
+                    printf("%s ", hybrid_name);
+                    printf("%s ", exact);
+                    printf("%s ", name);
+                    printf("%s ", hybrid_salary);
+                    printf("%s ", hybrid_operator);
+                    printf(" %d\n", salary);
+                 //Todo-----------------------------
+                /*if (!strcmp(exact, exact_mode))
+                     //Todo-----------------------------
+                else if (!strcmp(exact, starts_with_mode))
+                    //Todo-----------------------------*/                
+                }
+                if (strcmp(hybrid_operator, operator_4) == 0)
+                {
+                    fscanf(file_pointer, "%d", &salary);
+                    printf("%s ", operation_type);
+                    printf("%s ", type);
+                    printf("%s ", hybrid_name);
+                    printf("%s ", exact);
+                    printf("%s ", name);
+                    printf("%s ", hybrid_salary);
+                    printf("%s ", hybrid_operator);
+                    printf(" %d\n", salary);
+                 //Todo-----------------------------
+                /*if (!strcmp(exact, exact_mode))
+                     //Todo-----------------------------
+                else if (!strcmp(exact, starts_with_mode))
+                    //Todo-----------------------------*/                
+                }
+                if (strcmp(hybrid_operator, operator_5) == 0)
+                {
+                    fscanf(file_pointer, "%d", &salary);
+                    printf("%s ", operation_type);
+                    printf("%s ", type);
+                    printf("%s ", hybrid_name);
+                    printf("%s ", exact);
+                    printf("%s ", name);
+                    printf("%s ", hybrid_salary);
+                    printf("%s ", hybrid_operator);
+                    printf(" %d\n", salary);
+                 //Todo-----------------------------
+                /*if (!strcmp(exact, exact_mode))
+                     //Todo-----------------------------
+                else if (!strcmp(exact, starts_with_mode))
+                    //Todo-----------------------------*/                
+                }
+
+            }
+            
+
+
 
             if (strcmp(type, salary_type) == 0)
             {
-                char operator_type[4];
-                char operator_1[] = "=";
-                char operator_2[] = ">";
-                char operator_3[] = "<";
-                char operator_4[] = ">=";
-                char operator_5[] = "=<";
                 fscanf(file_pointer, "%s", operator_type);
                 fscanf(file_pointer, "%d", &salary);
                 if (strcmp(operator_type, operator_1) == 0)
@@ -381,15 +495,7 @@ void read_config_client(char file_name[])
                     printf(" %d\n", salary);
                     select_salary(salary, 0);
                 }
-                if (strcmp(operator_type, operator_2) == 0)
-                {
-                    fscanf(file_pointer, "%d", &salary);
-                    printf("%s ", operation_type);
-                    printf("%s ", type);
-                    printf("%s ", operator_type);
-                    printf(" %d\n", salary);
-                    select_salary(salary, 1);
-                }
+                
                 if (strcmp(operator_type, operator_3) == 0)
                 {
                     fscanf(file_pointer, "%d", &salary);

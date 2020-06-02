@@ -1,32 +1,24 @@
-I'm process 11802 and this is the output of my select salary 1000, and mode : 0:
+I'm process 3558 and this is the output of my select salary 1000, and mode : 0:
 Key			Name			Salary
 5			andrew			1000
-I'm process 11802 and this is the output of my select name a, and exact : 0:
+I'm process 3558 and this is the output of my select name a, and exact : 0:
 Key			Name			Salary
 0			ahmed			4000
 5			andrew			1000
 6			antonio			2000
-I'm process 11802 and this is the output of my select name ahmed, and exact : 1:
+I'm process 3558 and this is the output of my select name ahmed, and exact : 1:
 Key			Name			Salary
 0			ahmed			4000
-I'm process 11802 and this is the output of my select name ahmeddd, and exact : 1:
+I'm process 3558 and this is the output of my select name ahmeddd, and exact : 1:
 Key			Name			Salary
-I'm process 11802 and this is the output of my select name ah, and exact : 0:
+I'm process 3558 and this is the output of my select name ah, and exact : 0:
 Key			Name			Salary
 0			ahmed			4000
-I'm process 11802 and this is the output of my select name an, and exact : 0:
+I'm process 3558 and this is the output of my select name an, and exact : 0:
 Key			Name			Salary
 5			andrew			1000
 6			antonio			2000
-I'm process 11802 and this is the output of my select salary 1000, and mode : 1:
-Key			Name			Salary
-0			ahmed			4000
-1			omar			7000
-2			mohamed			6000
-3			ibrahim			7000
-4			sayed			8000
-6			antonio			2000
-I'm process 11802 and this is the output of my select salary 1000, and mode : 3:
+I'm process 3558 and this is the output of my select salary 1000, and mode : 3:
 Key			Name			Salary
 0			ahmed			4000
 1			omar			7000
@@ -35,8 +27,8 @@ Key			Name			Salary
 4			sayed			8000
 5			andrew			1000
 6			antonio			2000
-I'm process 11802 and this is the output of my select salary 2000, and mode : 2:
+I'm process 3558 and this is the output of my select salary 2000, and mode : 2:
 Key			Name			Salary
 5			andrew			1000
-I'm process 11802 and this is the output of my select salary 5000, and mode : 0:
+I'm process 3558 and this is the output of my select salary 5000, and mode : 0:
 Key			Name			Salary
