@@ -1,6 +1,0 @@
-add ahmed 5000 3 
-sleep 2
-modify 1 500
-
-
-

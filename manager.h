@@ -23,7 +23,7 @@ struct record{
     int key;
     char name[20];
     int salary;
-   struct Sem  *sem1;
+    struct Sem  *sem1;
 };
   // struct Sem sem1;
 struct message{

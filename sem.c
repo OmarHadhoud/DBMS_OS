@@ -70,8 +70,11 @@ void sem_delete(struct Sem *s)
  */
 void acquire_sem(struct Sem *s, int pid)
 {
+
+   // printf("locked=%d and pi = %d and I am %d \n",s->locked,pid,getpid());
     if (s->locked == 0)
     {
+        
         if(SEM_VERBOS) printf("sem given by %d to %d\n",(int)getpid(),pid);
         //Acquire the sem, wake the process.
         s->locked = 1;

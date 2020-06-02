@@ -20,7 +20,8 @@
  * The main of the client process
  */
 void client_main()
-{
+{ 
+    printf("I'm the Client, my pid is : %d\n", getpid());
     
     //Get the db shared memory as read-only for queries
     manager_shared_memory = (struct ManagerSharedMemory *)shmat(sys_info.records_shmid, NULL, SHM_RDONLY);
@@ -31,22 +32,26 @@ void client_main()
     //Produce(msg2);
     if(client_number==1)
     {
-    //  client_add_record("ahmed",4000,5);
       
       read_config_client("1.txt");
-    if(manager_shared_memory)
-    printf("salary in record 1 = %d\n", manager_shared_memory->records[0].salary) ;
-
+    
     }
 
-   // else if(client_number==2)
-   // {
-     //   read_config_client("2.txt");
-   // }
-   // else if(client_number==3)
-   // {
-     // read_config_client("3.txt");
-   // }
+    else if(client_number==2)
+    {
+        read_config_client("2.txt");
+     
+    
+    }
+    else if(client_number==3)
+    {
+      read_config_client("3.txt");
+      printf("salary in record 0 = %d\n", manager_shared_memory->records[0].salary) ;
+      printf("salary in record 1 = %d\n", manager_shared_memory->records[1].salary) ;
+      printf("salary in record 2 = %d\n", manager_shared_memory->records[2].salary) ;
+      printf("salary in record 3 = %d\n", manager_shared_memory->records[3].salary) ;
+      printf("salary in record 4 = %d\n", manager_shared_memory->records[4].salary) ;
+    }
    // else if(client_number==4)
    // {
      //    read_config_client("4.txt");
@@ -100,29 +105,32 @@ void client_modify(int key, int value)
     buff.type_operation =2;
     buff.message_record.salary = value;
     buff.pid = getpid();
+    
     int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff), !IPC_NOWAIT);
     if (send_val == -1)
         perror("Error in send");
 
-    kill(sys_info.db_manager_pid, SIGCONT);
-    raise(SIGSTOP);
 }
-
 /*
  * Tell the manager I want to lock a certain record.
  */
 void client_acquire(int key)
 {
+    printf("in acquire client---------------------------\n");
     struct message buff;
     buff.mtype = sys_info.db_manager_pid;
     buff.message_record.key = key;
+    buff.type_operation = 3 ;
     buff.pid = getpid();
-    int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), 0);
+    int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff), !IPC_NOWAIT);
     if (send_val == -1)
         perror("Error in send");
+    printf("hi2\n");    
+    int rec_val = msgrcv(sys_info.dbmanager_msgqid, &buff, sizeof(buff), getpid(), !IPC_NOWAIT);
+    printf("bye2\n");
+    if (rec_val == -1)
+        perror("Error in recieve");
 
-    kill(sys_info.db_manager_pid, SIGCONT);
-    raise(SIGSTOP);
 }
 
 /*
@@ -130,16 +138,16 @@ void client_acquire(int key)
  */
 void client_release(int key)
 {
+    printf("in release client---------------------------\n");
     struct message buff;
     buff.mtype = sys_info.db_manager_pid;
     buff.message_record.key = key;
+    buff.type_operation = 4 ;
     buff.pid = getpid();
-    int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), 0);
+    int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff),!IPC_NOWAIT);
     if (send_val == -1)
         perror("Error in send");
 
-    kill(sys_info.db_manager_pid, SIGCONT);
-    raise(SIGSTOP);
 }
 
 /*
@@ -151,7 +159,7 @@ void select_all()
     //Critical section, write to file the records directly
     //Open file to append in
     FILE *F = fopen(QUERY_LOGGER_FILE_NAME, "a");
-    Produce("Opened the query logger file to append to it my queries.\n");
+    //Produce("Opened the query logger file to append to it my queries.\n");
     if (F == NULL)
         perror("Couldn't create file");
     struct record *rec = client_shm_records;
@@ -161,10 +169,10 @@ void select_all()
         fprintf("%d\t%s\t%d\n", rec->key, rec->name, rec->salary);
         fflush(F);
     }
-    Produce("Printed the queries!\n");
+    //Produce("Printed the queries!\n");
     //Close the file after writing and release the lock
     fclose(F);
-    Produce("Closed the query logger file after appending my queries");
+    //Produce("Closed the query logger file after appending my queries");
     release_query_logger_sem();
 }
 
@@ -176,7 +184,7 @@ void select_name(char *name, int exact)
     acquire_query_logger_sem();
     //Critical section, write to file the records directly
     //Open file to append in
-    Produce("Opened the query logger file to append to it my queries.\n");
+   // Produce("Opened the query logger file to append to it my queries.\n");
     FILE *F = fopen(QUERY_LOGGER_FILE_NAME, "a");
     if (F == NULL)
         perror("Couldn't create file");
@@ -189,10 +197,10 @@ void select_name(char *name, int exact)
         fprintf("%d\t%s\t%d\n", rec->key, rec->name, rec->salary);
         fflush(F);
     }
-    Produce("Printed the queries!\n");
+    //Produce("Printed the queries!\n");
     //Close the file after writing and release the lock
     fclose(F);
-    Produce("Closed the query logger file after appending my queries");
+    //Produce("Closed the query logger file after appending my queries");
     release_query_logger_sem();
 }
 
@@ -204,7 +212,7 @@ void select_salary(int salary, int mode)
     acquire_query_logger_sem();
     //Critical section, write to file the records directly
     //Open file to append in
-    Produce("Opened the query logger file to append to it my queries.\n");
+  //  Produce("Opened the query logger file to append to it my queries.\n");
     FILE *F = fopen(QUERY_LOGGER_FILE_NAME, "a");
     if (F == NULL)
         perror("Couldn't create file");
@@ -218,10 +226,10 @@ void select_salary(int salary, int mode)
         fprintf("%d\t%s\t%d\n", rec->key, rec->name, rec->salary);
         fflush(F);
     }
-    Produce("Printed the queries!\n");
+   // Produce("Printed the queries!\n");
     //Close the file after writing and release the lock
     fclose(F);
-    Produce("Closed the query logger file after appending my queries");
+    //Produce("Closed the query logger file after appending my queries");
     release_query_logger_sem();
 }
 
@@ -233,7 +241,7 @@ void select_hybrid(char *name, int salary, int mode, int exact)
     acquire_query_logger_sem();
     //Critical section, write to file the records directly
     //Open file to append in
-    Produce("Opened the query logger file to append to it my queries.\n");
+    //Produce("Opened the query logger file to append to it my queries.\n");
     FILE *F = fopen(QUERY_LOGGER_FILE_NAME, "a");
     if (F == NULL)
         perror("Couldn't create file");
@@ -247,10 +255,10 @@ void select_hybrid(char *name, int salary, int mode, int exact)
         fprintf("%d\t%s\t%d\n", rec->key, rec->name, rec->salary);
         fflush(F);
     }
-    Produce("Printed the queries!\n");
+    //Produce("Printed the queries!\n");
     //Close the file after writing and release the lock
     fclose(F);
-    Produce("Closed the query logger file after appending my queries");
+    //Produce("Closed the query logger file after appending my queries");
     release_query_logger_sem();
 }
 
@@ -310,8 +318,7 @@ void read_config_client(char file_name[])
          char sleep_type[] = "sleep";
 
           if(strcmp(operation_type, add) == 0)
-            {
-               printf("%s ", operation_type);    
+            {    
             	fscanf(file_pointer,"%s",name);
 	        fscanf(file_pointer,"%d",&salary);
                  fscanf(file_pointer,"%d",&key);
@@ -333,17 +340,13 @@ void read_config_client(char file_name[])
          
           if(strcmp(operation_type, release) == 0)
             {
-                printf("%s ", operation_type);
            	fscanf(file_pointer,"%d",&key);
-	        printf("%d \n", key);
             client_release(key);
             }
            if(strcmp(operation_type,sleep_type) == 0)
             {
-                printf("%s ", operation_type);
            	fscanf(file_pointer,"%d",&key);
-	        printf("%d \n", key);
-                sleep(key);
+            sleep(key);
             } 
             if(strcmp(operation_type,query) == 0)
 	    {

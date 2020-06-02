@@ -1,1 +1,11 @@
 add ahmed 5000 5
+add omar 7000 6
+add mohamed 4000 8
+modify 2 2000
+sleep 5
+acquire 1
+modify 3 4000
+acquire 2
+release 1
+
+

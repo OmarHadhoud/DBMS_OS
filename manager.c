@@ -41,7 +41,7 @@ void manager_add_record(char name[20], int salary,int pid)
   //  int rec_val = msgrcv(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record),sys_info.db_manager_pid, IPC_NOWAIT);
    // if (rec_val == -1)
       //  perror("Error in recieve");
-printf("salary = %d - \n",salary);
+printf("salary = %d \n",salary);
 printf("name is %s \n",name);
    // printf("current_key = %d \n",current_key);
     //if(manager_shm_record[current_key])
@@ -56,16 +56,15 @@ printf("name is %s \n",name);
         if(name[i] >= 'a' && name[i] <= 'z')
             manager_shm_record[current_key].name[i] = name[i];
     }
-    
-    sem_initialize( &manager_shm_record[current_key].sem1);
-    printf("manger add\n"); 
+    manager_shm_record[current_key].sem1 = malloc(sizeof(struct Sem));
+    sem_initialize(manager_shm_record[current_key].sem1); 
     struct message buff ; 
     //return key to client
     buff.message_record.key = current_key++;
     //buff.mtype = buff.pid;
     buff.mtype =pid ;
     printf("I added from client %d\n",pid);
-    int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), 0);
+    int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), !IPC_NOWAIT);
     if (send_val == -1)
         perror("Error in send");
     
@@ -74,48 +73,60 @@ printf("name is %s \n",name);
 /*
  * add or subtract a certain value to the salary of a certain record.
  */
-void manager_modify()
+void manager_modify(int key, int value)
 {
-    struct message buff;
+    if(key>current_key)
+    {
+        printf("the record have not initialized yet") ;
+    }
+    else
+    {
+    printf("I will modify salary with= %d of record %d \n",value,key);
     struct record* manager_shm_record = manager_shared_memory->records;
-    int rec_val = msgrcv(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), getpid(), 0);
-    if (rec_val == -1)
-        perror("Error in recieve");
-
-    manager_shm_record[buff.message_record.key].salary += buff.message_record.salary;
-    kill(buff.pid,SIGCONT);
-    raise(SIGSTOP);
+    manager_shm_record[key].salary += value;
+    }
 }
 
 /*
  * lock and return the lock, if locked add in queue.
  */
-void manager_acquire()
+void manager_acquire(int key , int pid)
 {
-    struct message buff;
+    if(key>current_key)
+    {
+        printf("the record have not initialized yet") ;
+    }
+    else
+    {   
     struct record* manager_shm_record = manager_shared_memory->records;
-    int rec_val = msgrcv(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), getpid(), IPC_NOWAIT);
-    if (rec_val == -1)
-        perror("Error in recieve");
-
-    acquire_sem (manager_shm_record[buff.message_record.key].sem1, buff.pid);
-    raise(SIGSTOP);
+    printf("I will acquire sem now key = %d and pid =%d \n",key,pid);
+    if(&manager_shm_record[key].sem1)
+    acquire_sem (manager_shm_record[key].sem1, pid);
+     struct message buff ; 
+    buff.mtype=pid ;
+    int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff), !IPC_NOWAIT);
+    if (send_val == -1)
+        perror("Error in send");
+    
+    }
 }
 
 /*
  * removes the lock, grants it to next in queue.
  */
-void manager_release()
+void manager_release(int key , int pid)
 {
-   struct message buff;
+     printf("Hi \n");
+        if(key>current_key)
+    {
+        printf("the record have not initialized yet") ;
+    }
+    else
+    {
     struct record* manager_shm_record = manager_shared_memory->records;
-    int rec_val = msgrcv(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), getpid(), 0);
-    if (rec_val == -1)
-        perror("Error in recieve");
-
-    release_sem (manager_shm_record[buff.message_record.key].sem1, buff.pid);
-    kill(buff.pid,SIGCONT);
-    raise(SIGSTOP);
+    printf("I will release sem now \n");
+    release_sem (manager_shm_record[key].sem1,pid);
+    }
     
 }
 void check_operation()
@@ -129,25 +140,24 @@ void check_operation()
     else
     {
         int type = buff.type_operation;
+
         if(type==1)
         {
-            printf("call add---------------------%d\n",getpid());
             manager_add_record(buff.message_record.name,buff.message_record.salary,buff.pid);
-           
-
-
         }
         else if(type==2)
         {
+             manager_modify(buff.message_record.key,buff.message_record.salary);
 
         }
         else if(type==3)
         {
-            /* code */
+            manager_acquire(buff.message_record.key, buff.pid);
         }
-        else
+        else if(type==4)
         {
-            /* code */
+            
+            manager_release(buff.message_record.key, buff.pid);
         }
     }
     

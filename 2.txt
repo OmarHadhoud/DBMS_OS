@@ -1,2 +1,5 @@
-add omar 5000 3
-modify 1 500
+sleep 2
+add ibrahim 3000 2
+add sayed 8000 20
+release 2
+modify 0 -1000
