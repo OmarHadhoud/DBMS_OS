@@ -154,10 +154,10 @@ void select_all()
     for (int i = 0; i < 1000 && manager_shared_memory->records[i].key >= 0; i++)
     {
         fprintf(F, "%d\t\t\t%s\t\t\t%d\n", manager_shared_memory->records[i].key, manager_shared_memory->records[i].name, manager_shared_memory->records[i].salary);
-        fflush(F);
     }
     Produce("Printed the queries!\n");
     //Close the file after writing and release the lock
+    fflush(F);
     fclose(F);
     Produce("Closed the query logger file after appending my queries");
     release_query_logger_sem();
@@ -182,10 +182,10 @@ void select_name(char *name, int exact)
         if (!check_name(manager_shared_memory->records[i].name, name, exact))
             continue;
         fprintf(F, "%d\t\t\t%s\t\t\t%d\n", manager_shared_memory->records[i].key, manager_shared_memory->records[i].name, manager_shared_memory->records[i].salary);
-        fflush(F);
     }
     Produce("Printed the queries!\n");
     //Close the file after writing and release the lock
+    fflush(F);
     fclose(F);
     Produce("Closed the query logger file after appending my queries");
     release_query_logger_sem();
@@ -211,10 +211,10 @@ void select_salary(int salary, int mode)
             continue;
 
         fprintf(F, "%d\t\t\t%s\t\t\t%d\n", manager_shared_memory->records[i].key, manager_shared_memory->records[i].name, manager_shared_memory->records[i].salary);
-        fflush(F);
     }
     Produce("Printed the queries!\n");
     //Close the file after writing and release the lock
+    fflush(F);
     fclose(F);
     Produce("Closed the query logger file after appending my queries");
     release_query_logger_sem();
@@ -240,10 +240,10 @@ void select_hybrid(char *name, int salary, int mode, int exact)
             continue;
 
         fprintf(F, "%d\t\t\t%s\t\t\t%d\n", manager_shared_memory->records[i].key, manager_shared_memory->records[i].name, manager_shared_memory->records[i].salary);
-        fflush(F);
     }
     Produce("Printed the queries!\n");
     //Close the file after writing and release the lock
+    fflush(F);
     fclose(F);
     Produce("Closed the query logger file after appending my queries");
     release_query_logger_sem();
