@@ -1,5 +1,4 @@
 sleep 2
 add ibrahim 3000 2
 add sayed 8000 20
-release 2
 modify 0 -1000

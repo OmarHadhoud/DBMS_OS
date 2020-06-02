@@ -7,5 +7,18 @@ acquire 1
 modify 3 4000
 acquire 2
 release 1
+add andrew 1000 2
+add antonio 2000 3
+query salary = 1000
+query name starts_with a
+query name exact ahmed
+query name exact ahmeddd
+query name starts_with ah
+query name starts_with an
+query salary > 1000
+query salary >= 1000
+query salary < 2000
+query salary <= 2000
+query salary = 5000
 
 

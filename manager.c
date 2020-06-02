@@ -20,14 +20,12 @@ int current_key = 0;
 void manager_main()
 {
     //printf("I'm the manager, my pid is : %d\n", getpid());
-    manager_shared_memory = (struct ManagerSharedMemory*) shmat(sys_info.records_shmid,NULL,0);
-   //printf("size of struct= %d\n",sizeof(struct ManagerSharedMemory)); 
-   
- 
-    while(1)
+    manager_shared_memory = (struct ManagerSharedMemory *)shmat(sys_info.records_shmid, NULL, 0);
+    //printf("size of struct= %d\n",sizeof(struct ManagerSharedMemory));
+    setup_records();
+    while (1)
     {
-     check_operation();
-       
+        check_operation();
     }
 }
 
@@ -67,7 +65,6 @@ printf("name is %s \n",name);
     int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), !IPC_NOWAIT);
     if (send_val == -1)
         perror("Error in send");
-    
 }
 
 /*
@@ -116,7 +113,6 @@ void manager_acquire(int key , int pid)
  */
 void manager_release(int key , int pid)
 {
-     printf("Hi \n");
         if(key>current_key)
     {
         printf("the record have not initialized yet") ;
@@ -130,13 +126,13 @@ void manager_release(int key , int pid)
     
 }
 void check_operation()
-{   
-    
-     struct message buff;
-    int rec_val = msgrcv(sys_info.dbmanager_msgqid, &buff, sizeof(buff),sys_info.db_manager_pid, !IPC_NOWAIT);
-     if (rec_val == -1)
+{
+
+    struct message buff;
+    int rec_val = msgrcv(sys_info.dbmanager_msgqid, &buff, sizeof(buff), sys_info.db_manager_pid, !IPC_NOWAIT);
+    if (rec_val == -1)
         perror("Error in recieve");
-    
+
     else
     {
         int type = buff.type_operation;
@@ -145,12 +141,12 @@ void check_operation()
         {
             manager_add_record(buff.message_record.name,buff.message_record.salary,buff.pid);
         }
-        else if(type==2)
+        else if (type == 2)
         {
              manager_modify(buff.message_record.key,buff.message_record.salary);
 
         }
-        else if(type==3)
+        else if (type == 3)
         {
             manager_acquire(buff.message_record.key, buff.pid);
         }
@@ -160,6 +156,11 @@ void check_operation()
             manager_release(buff.message_record.key, buff.pid);
         }
     }
-    
+}
 
+void setup_records()
+{
+    for (int i = 0; i < 1000; i++)
+        manager_shared_memory->records[i].key = -1;
+    current_key = 0;
 }

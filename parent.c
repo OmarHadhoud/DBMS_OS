@@ -83,7 +83,7 @@ void fork_children(int n)
 void initialize_resources()
 {
     //Create the shared memory segment for records struct.
-    sys_info.records_shmid = shmget(IPC_PRIVATE,sizeof(struct record),0666|IPC_CREAT);
+    sys_info.records_shmid = shmget(IPC_PRIVATE,sizeof(struct ManagerSharedMemory),0666|IPC_CREAT);
     
     //Create the shared memory segment for logger struct.
     sys_info.logger_shmid = shmget(IPC_PRIVATE,sizeof(struct LoggerSharedMemory),0666|IPC_CREAT);
@@ -94,6 +94,14 @@ void initialize_resources()
     sys_info.logger_pid = pids[2];
     sys_info.query_logger_pid = pids[3];
     sys_info.deadlock_detector_pid = pids[4];
+
+    //Empty current queries file to start a new one
+    FILE *F = fopen(QUERY_LOGGER_FILE_NAME, "w");
+    if (F == NULL)
+        perror("Couldn't create file");
+    fprintf(F,"");
+    fclose(F);
+
 }
 
 /*
