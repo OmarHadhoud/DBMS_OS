@@ -22,8 +22,8 @@ query salary <= 2000
 query salary = 5000
 query select all
 query hybrid name exact ahmed salary > 2000
-query hybrid name start_with om salary < 10000
-query hybrid name start_with s salary <= 5000
-query hybrid name start_with i salary >= 5000
-query hybrid name start_with moha salary = 4000
+query hybrid name starts_with om salary < 10000
+query hybrid name starts_with s salary <= 5000
+query hybrid name starts_with i salary >= 5000
+query hybrid name starts_with moha salary = 4000
 

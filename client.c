@@ -366,19 +366,19 @@ void read_config_client(char file_name[])
                 else if (!strcmp(exact, starts_with_mode))
                     select_name(name, 0);
             }
-            
+
             if (strcmp(type, select_type) == 0)
             {
-                char all_data[5] ;
+                char all_data[5];
                 fscanf(file_pointer, "%s", all_data);
                 printf("%s ", operation_type);
                 printf("%s ", type);
                 printf("%s \n", all_data);
-                //Todo----------------------------- 
+                select_all();
             }
             if (strcmp(type, hybrid_mode) == 0)
             {
-                char hybrid_name[8] ;
+                char hybrid_name[8];
                 char hybrid_salary[8];
                 char hybrid_operator[3];
                 fscanf(file_pointer, "%s", hybrid_name);
@@ -398,12 +398,11 @@ void read_config_client(char file_name[])
                     printf("%s ", hybrid_salary);
                     printf("%s ", hybrid_operator);
                     printf(" %d\n", salary);
-                 //Todo-----------------------------
-                /*if (!strcmp(exact, exact_mode))
-                     //Todo-----------------------------
-                else if (!strcmp(exact, starts_with_mode))
-                    //Todo-----------------------------*/
 
+                    if (!strcmp(exact, exact_mode))
+                        select_hybrid(name, salary, 0, 1);
+                    else if (!strcmp(exact, starts_with_mode))
+                        select_hybrid(name, salary, 0, 0);
                 }
                 if (strcmp(hybrid_operator, operator_2) == 0)
                 {
@@ -416,11 +415,10 @@ void read_config_client(char file_name[])
                     printf("%s ", hybrid_salary);
                     printf("%s ", hybrid_operator);
                     printf(" %d\n", salary);
-                 //Todo-----------------------------
-                /*if (!strcmp(exact, exact_mode))
-                     //Todo-----------------------------
-                else if (!strcmp(exact, starts_with_mode))
-                    //Todo-----------------------------*/                
+                    if (!strcmp(exact, exact_mode))
+                        select_hybrid(name, salary, 1, 1);
+                    else if (!strcmp(exact, starts_with_mode))
+                        select_hybrid(name, salary, 1, 0);
                 }
                 if (strcmp(hybrid_operator, operator_3) == 0)
                 {
@@ -433,11 +431,10 @@ void read_config_client(char file_name[])
                     printf("%s ", hybrid_salary);
                     printf("%s ", hybrid_operator);
                     printf(" %d\n", salary);
-                 //Todo-----------------------------
-                /*if (!strcmp(exact, exact_mode))
-                     //Todo-----------------------------
-                else if (!strcmp(exact, starts_with_mode))
-                    //Todo-----------------------------*/                
+                    if (!strcmp(exact, exact_mode))
+                        select_hybrid(name, salary, 2, 1);
+                    else if (!strcmp(exact, starts_with_mode))
+                        select_hybrid(name, salary, 2, 0);
                 }
                 if (strcmp(hybrid_operator, operator_4) == 0)
                 {
@@ -450,11 +447,10 @@ void read_config_client(char file_name[])
                     printf("%s ", hybrid_salary);
                     printf("%s ", hybrid_operator);
                     printf(" %d\n", salary);
-                 //Todo-----------------------------
-                /*if (!strcmp(exact, exact_mode))
-                     //Todo-----------------------------
-                else if (!strcmp(exact, starts_with_mode))
-                    //Todo-----------------------------*/                
+                    if (!strcmp(exact, exact_mode))
+                        select_hybrid(name, salary, 3, 1);
+                    else if (!strcmp(exact, starts_with_mode))
+                        select_hybrid(name, salary, 3, 0);
                 }
                 if (strcmp(hybrid_operator, operator_5) == 0)
                 {
@@ -467,17 +463,12 @@ void read_config_client(char file_name[])
                     printf("%s ", hybrid_salary);
                     printf("%s ", hybrid_operator);
                     printf(" %d\n", salary);
-                 //Todo-----------------------------
-                /*if (!strcmp(exact, exact_mode))
-                     //Todo-----------------------------
-                else if (!strcmp(exact, starts_with_mode))
-                    //Todo-----------------------------*/                
+                    if (!strcmp(exact, exact_mode))
+                        select_hybrid(name, salary, 4, 1);
+                    else if (!strcmp(exact, starts_with_mode))
+                        select_hybrid(name, salary, 4, 0);
                 }
-
             }
-            
-
-
 
             if (strcmp(type, salary_type) == 0)
             {
@@ -492,7 +483,7 @@ void read_config_client(char file_name[])
                     printf(" %d\n", salary);
                     select_salary(salary, 0);
                 }
-                
+
                 if (strcmp(operator_type, operator_3) == 0)
                 {
                     fscanf(file_pointer, "%d", &salary);
