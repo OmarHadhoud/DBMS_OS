@@ -40,7 +40,7 @@ struct ManagerSharedMemory
 struct ManagerSharedMemory *manager_shared_memory;
 
 extern int current_key;
-
+int manager_On ;
 /*
  * manager process functions.
  * 

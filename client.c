@@ -68,7 +68,7 @@ void client_add_record(char name[20], int salary, int key)
     buff.message_record.salary = salary;
     buff.type_operation = 1;
     buff.pid = getpid();
-
+    Produce("Client asked manager to add new record and waiting him to return real key");
     for (int i = 0; i <= 20; i++)
     {
         if (name[i] >= 'a' && name[i] <= 'z')
@@ -84,6 +84,7 @@ void client_add_record(char name[20], int salary, int key)
 
     key = buff.message_record.key;
     printf("the new key is = %d\n", key);
+    Produce("Client have received the real key");
 }
 
 /*
@@ -97,7 +98,7 @@ void client_modify(int key, int value)
     buff.type_operation = 2;
     buff.message_record.salary = value;
     buff.pid = getpid();
-
+    Produce("Client asked manager to modify certain record");
     int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff), !IPC_NOWAIT);
     if (send_val == -1)
         perror("Error in send");
@@ -113,6 +114,7 @@ void client_acquire(int key)
     buff.message_record.key = key;
     buff.type_operation = 3;
     buff.pid = getpid();
+    Produce("Client asked manager to acquire lock of certain record");
     int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff), !IPC_NOWAIT);
     if (send_val == -1)
         perror("Error in send");
@@ -132,6 +134,7 @@ void client_release(int key)
     buff.message_record.key = key;
     buff.type_operation = 4;
     buff.pid = getpid();
+    Produce("Client asked manager to release lock of certain record");
     int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff), !IPC_NOWAIT);
     if (send_val == -1)
         perror("Error in send");

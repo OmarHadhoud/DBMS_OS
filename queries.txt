@@ -1,62 +1,64 @@
-I'm process 5491 and this is the output of my select name sayed, and exact : 1:
+I'm process 6462 and this is the output of my select name sayed, and exact : 1:
 Key			Name			Salary
-I'm process 5490 and this is the output of my select name ib, and exact : 0:
+I'm process 6461 and this is the output of my select name ib, and exact : 0:
 Key			Name			Salary
 3			ibrahim			3000
-I'm process 5491 and this is the output of my select salary 90000, and mode : 3:
+I'm process 6462 and this is the output of my select salary 90000, and mode : 3:
 Key			Name			Salary
-I'm process 5489 and this is the output of my select salary 1000, and mode : 0:
+I'm process 6460 and this is the output of my select salary 1000, and mode : 0:
 Key			Name			Salary
 5			andrew			1000
-I'm process 5489 and this is the output of my select name a, and exact : 0:
+I'm process 6460 and this is the output of my select name a, and exact : 0:
 Key			Name			Salary
-0			ahmedb			4000
-5			andrew			1000
-6			antonio			2000
-I'm process 5489 and this is the output of my select name ahmed, and exact : 1:
-Key			Name			Salary
-I'm process 5489 and this is the output of my select name ahmeddd, and exact : 1:
-Key			Name			Salary
-I'm process 5489 and this is the output of my select name ah, and exact : 0:
-Key			Name			Salary
-0			ahmedb			4000
-I'm process 5489 and this is the output of my select name an, and exact : 0:
-Key			Name			Salary
+0			ahmed			4000
 5			andrew			1000
 6			antonio			2000
-I'm process 5489 and this is the output of my select salary 1000, and mode : 3:
+I'm process 6460 and this is the output of my select name ahmed, and exact : 1:
 Key			Name			Salary
-0			ahmedb			4000
+0			ahmed			4000
+I'm process 6460 and this is the output of my select name ahmeddd, and exact : 1:
+Key			Name			Salary
+I'm process 6460 and this is the output of my select name ah, and exact : 0:
+Key			Name			Salary
+0			ahmed			4000
+I'm process 6460 and this is the output of my select name an, and exact : 0:
+Key			Name			Salary
+5			andrew			1000
+6			antonio			2000
+I'm process 6460 and this is the output of my select salary 1000, and mode : 3:
+Key			Name			Salary
+0			ahmed			4000
 1			omar			7000
 2			mohamed			6000
 3			ibrahim			7000
 4			sayed			8000
 5			andrew			1000
 6			antonio			2000
-I'm process 5489 and this is the output of my select salary 2000, and mode : 2:
+I'm process 6460 and this is the output of my select salary 2000, and mode : 2:
 Key			Name			Salary
 5			andrew			1000
-I'm process 5489 and this is the output of my select salary 5000, and mode : 0:
+I'm process 6460 and this is the output of my select salary 5000, and mode : 0:
 Key			Name			Salary
-I'm process 5489 and this is the output of my select all query:
+I'm process 6460 and this is the output of my select all query:
 Key			Name			Salary
-0			ahmedb			4000
+0			ahmed			4000
 1			omar			7000
 2			mohamed			6000
 3			ibrahim			7000
 4			sayed			8000
 5			andrew			1000
 6			antonio			2000
-I'm process 5489 and this is the output of my select hybrid, name:  ahmed, and exact : 1, salary: 2000, mode: 1:
+I'm process 6460 and this is the output of my select hybrid, name:  ahmed, and exact : 1, salary: 2000, mode: 1:
 Key			Name			Salary
-I'm process 5489 and this is the output of my select hybrid, name:  om, and exact : 0, salary: 10000, mode: 2:
+0			ahmed			4000
+I'm process 6460 and this is the output of my select hybrid, name:  om, and exact : 0, salary: 10000, mode: 2:
 Key			Name			Salary
 1			omar			7000
-I'm process 5489 and this is the output of my select hybrid, name:  i, and exact : 0, salary: 5000, mode: 3:
+I'm process 6460 and this is the output of my select hybrid, name:  i, and exact : 0, salary: 5000, mode: 3:
 Key			Name			Salary
 3			ibrahim			7000
-I'm process 5489 and this is the output of my select hybrid, name:  moha, and exact : 0, salary: 4000, mode: 0:
+I'm process 6460 and this is the output of my select hybrid, name:  moha, and exact : 0, salary: 4000, mode: 0:
 Key			Name			Salary
-I'm process 5491 and this is the output of my select salary 90000, and mode : 3:
+I'm process 6462 and this is the output of my select salary 90000, and mode : 3:
 Key			Name			Salary
 7			bigboss			100000

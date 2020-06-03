@@ -210,8 +210,8 @@ void parent_main()
             //Send signals to util processes to die.
             kill(sys_info.query_logger_pid, SIGUSR1);
             //TODO: change to SIGUSR1
-            kill(sys_info.db_manager_pid, SIGCONT); //TODO: Remove this, for now it used until done by messages
-            kill(sys_info.db_manager_pid, SIGTERM);
+          //  kill(sys_info.db_manager_pid, SIGCONT); //TODO: Remove this, for now it used until done by messages
+            kill(sys_info.db_manager_pid, SIGUSR1);
             kill(sys_info.deadlock_detector_pid, SIGTERM);
             sleep(2); //Leave time to logger to log every process dying
             kill(sys_info.logger_pid, SIGUSR1);
