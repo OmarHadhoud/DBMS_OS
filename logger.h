@@ -8,14 +8,16 @@
 #include "sem.h"
 //To use pid_t
 #include <sys/types.h>
+
 struct MsgBuff
 {
     //message receiver
 	long mtype;
 	pid_t sender;
-    //wants to acquire_sem or release it (1,0)
-    int acquire_sem;
+    int action; //wants to acquire sem or release it (refer to enum SimAction)
 };
+enum SimAction {RELEASE, ACQUIRE, NOTIFY};
+//enum SimAction sim_action;
 struct SingleLog {
     pid_t client_pid;
     char msg[MAX_LOG_LINE_SIZE];

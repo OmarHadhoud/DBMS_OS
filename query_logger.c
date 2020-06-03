@@ -16,10 +16,10 @@
 void query_log_sem_controller()
 {
     struct MsgBuff message;
-    message.acquire_sem = -1; //Prevent garbage value
+    message.action = NOTIFY; //Prevent garbage value
     //keep waiting for client requesting for sem or releasing sem
     if (msgrcv(sys_info.query_logger_msgqid, &message, sizeof(message)-sizeof(message.mtype), getpid(), !IPC_NOWAIT)==-1 ) if(query_logger_on) perror("Errror in receive");
-    if (message.acquire_sem == 1)
+    if (message.action == ACQUIRE)
     {
         acquire_sem(&query_sem, message.sender);        
         //Printing in log file of query logger
@@ -36,7 +36,7 @@ void query_log_sem_controller()
         if (msgsnd(sys_info.query_logger_msgqid, &message, sizeof(message) - sizeof(message.mtype), !IPC_NOWAIT) == -1)
             perror("Errror in send");
     }
-    else if (message.acquire_sem == 0)
+    else if (message.action == RELEASE)
     {
         release_sem(&query_sem, message.sender);
         //Printing in log file of query logger
@@ -55,7 +55,7 @@ void acquire_query_logger_sem()
 {
     //Printing in log file of client
     Produce("I'm asking to acquire the query logger semaphore");
-    struct MsgBuff message = {.mtype = sys_info.query_logger_pid, .sender = getpid(), .acquire_sem = 1};
+    struct MsgBuff message = {.mtype = sys_info.query_logger_pid, .sender = getpid(), .action = ACQUIRE};
     //send request to produce
     if (msgsnd(sys_info.query_logger_msgqid, &message, sizeof(message) - sizeof(message.mtype), !IPC_NOWAIT) == -1)
         perror("Errror in send");
@@ -71,7 +71,7 @@ void release_query_logger_sem()
 {
     //Printing in log file of client
     Produce("I'm asking to release the query logger semaphore");
-    struct MsgBuff message = {.mtype = sys_info.query_logger_pid, .sender = getpid(), .acquire_sem = 0};
+    struct MsgBuff message = {.mtype = sys_info.query_logger_pid, .sender = getpid(), .action = RELEASE};
     //release the sem
     if (msgsnd(sys_info.query_logger_msgqid, &message, sizeof(message) - sizeof(message.mtype), !IPC_NOWAIT) == -1)
         perror("Errror in send");
@@ -84,7 +84,7 @@ void query_logger_handler(int signum)
     if (signum == SIGUSR1)
         query_logger_on = 0;
     printf("Parent terminating query logger..\n");
-    struct MsgBuff message={.mtype = sys_info.query_logger_pid , .sender = 0 , .acquire_sem = -1};
+    struct MsgBuff message={.mtype = sys_info.query_logger_pid , .sender = 0 , .action = NOTIFY};
     if (msgsnd(sys_info.query_logger_msgqid, &message, sizeof(message)-sizeof(message.mtype), !IPC_NOWAIT)==-1) perror("Errror in send");
 }
 

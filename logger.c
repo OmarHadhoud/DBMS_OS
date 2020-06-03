@@ -12,12 +12,14 @@
 //To use Msgs
 #include <sys/types.h>
 #include <sys/msg.h>
+//To use Time
+#include <time.h>
 
 /*
  * Handles sending and receiving messages from others
  */
 void MsgSystem(){
-    struct MsgBuff message={.mtype = sys_info.logger_pid , .sender = getpid() , .acquire_sem = 1};
+    struct MsgBuff message={.mtype = sys_info.logger_pid , .sender = getpid() , .action = ACQUIRE};
     if(logger_shared_memory->producer_idx-logger_shared_memory->consumer_idx!=0){ //if there is need to consume don't wait 
         if (msgrcv(sys_info.logger_msgqid, &message, sizeof(message)-sizeof(message.mtype), getpid(), IPC_NOWAIT)==-1) 
         {
@@ -32,7 +34,7 @@ void MsgSystem(){
         //debugging
         //printf("0-----%d:  %d-%d = %d \n",message.sender,logger_shared_memory->producer_idx,logger_shared_memory->consumer_idx,current_number_of_produced);
     }
-    if (message.acquire_sem==1) 
+    if (message.action==ACQUIRE) 
     {
 
         acquire_sem(&sem,message.sender);
@@ -41,7 +43,7 @@ void MsgSystem(){
         //respond to the request (the client is waiting)
         if (msgsnd(sys_info.logger_msgqid, &message, sizeof(message)-sizeof(message.mtype), !IPC_NOWAIT)==-1) perror("Errror in send");
     
-    }else if(message.acquire_sem==0)
+    }else if(message.action==RELEASE)
     {
         //debugging
         //printf("r-----:  %d-%d = %d \n",logger_shared_memory->producer_idx,logger_shared_memory->consumer_idx,current_number_of_produced);
@@ -58,7 +60,7 @@ void Produce(char *msg){
     strcpy(log.msg, msg);
 
     kill(sys_info.logger_pid, SIGCONT);
-    struct MsgBuff message={.mtype = sys_info.logger_pid , .sender = getpid() , .acquire_sem = 1};
+    struct MsgBuff message={.mtype = sys_info.logger_pid , .sender = getpid() , .action = ACQUIRE};
     //send request to produce
     if(L_VERBOS) printf("Sending message to produce (logger) _%d\n", getpid());
     if (msgsnd(sys_info.logger_msgqid, &message, sizeof(message)-sizeof(message.mtype), !IPC_NOWAIT)==-1) perror("Errror in send");
@@ -78,7 +80,7 @@ void Produce(char *msg){
     
     message.mtype = sys_info.logger_pid ;
     message.sender = getpid();
-    message.acquire_sem = 0;
+    message.action = RELEASE;
     //release the sem
     if (msgsnd(sys_info.logger_msgqid, &message, sizeof(message)-sizeof(message.mtype), !IPC_NOWAIT)==-1) perror("Errror in send");
     if(L_VERBOS) printf("Semaphore released _%d\n", getpid());
@@ -96,8 +98,17 @@ int Consume(){
         if (current_number_of_produced) if(L_VERBOS) printf("\n Didn't consume %d\n", current_number_of_produced);
         return 1;
     } //no logs to consume
-  //  printf("cons-----:  %d-%d = %d \n",logger_shared_memory->producer_idx,logger_shared_memory->consumer_idx,current_number_of_produced);
+    //printf("cons-----:  %d-%d = %d \n",logger_shared_memory->producer_idx,logger_shared_memory->consumer_idx,current_number_of_produced);
     
+    //get the current time and format it in time_buffer
+    time_t timer;
+    char time_buffer[26];
+    struct tm* tm_info;
+    timer = time(NULL);
+    tm_info = localtime(&timer);
+    strftime(time_buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
+
+
     // adding logs
     log = logger_shared_memory->logs_array[(logger_shared_memory->consumer_idx+1)%MEM_SIZE];
     logger_shared_memory->consumer_idx++;
@@ -108,7 +119,7 @@ int Consume(){
 
     if(L_VERBOS) printf("--------------Starting consuming %d  %d _%d \n ",logger_shared_memory->consumer_idx, logger_shared_memory->producer_idx,getpid());
     
-    fprintf(F, "%s\n", log.msg);
+    fprintf(F, "%s: %s\n",time_buffer ,log.msg);
     fflush(F);
     fclose(F);
     return 0;                       
@@ -121,7 +132,7 @@ void handler(int signum)
 {
 	if (signum==SIGUSR1) loggerOn=0;
     printf("Parent terminating logger..\n");
-    struct MsgBuff message={.mtype = sys_info.logger_pid , .sender = 0 , .acquire_sem = -1};
+    struct MsgBuff message={.mtype = sys_info.logger_pid , .sender = 0 , .action = NOTIFY};
     if (msgsnd(sys_info.logger_msgqid, &message, sizeof(message)-sizeof(message.mtype), !IPC_NOWAIT)==-1) perror("Errror in send");
 }
 
