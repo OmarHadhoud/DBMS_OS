@@ -23,34 +23,18 @@ void client_main()
 
     //Get the db shared memory as read-only for queries
     manager_shared_memory = (struct ManagerSharedMemory *)shmat(sys_info.records_shmid, NULL, SHM_RDONLY);
-    char *msg = "help me please";
-    char *msg2 = "help me more";
     logger_shared_memory = (struct LoggerSharedMemory *)shmat(sys_info.logger_shmid, NULL, 0);
-    //Produce(msg);
-    //Produce(msg2);
-    if (client_number == 1)
-    {
-
-        read_config_client("1.txt");
-    }
-
-    else if (client_number == 2)
-    {
-        read_config_client("2.txt");
-    }
-    else if (client_number == 3)
-    {
-        read_config_client("3.txt");
-        printf("salary in record 0 = %d\n", manager_shared_memory->records[0].salary);
-        printf("salary in record 1 = %d\n", manager_shared_memory->records[1].salary);
-        printf("salary in record 2 = %d\n", manager_shared_memory->records[2].salary);
-        printf("salary in record 3 = %d\n", manager_shared_memory->records[3].salary);
-        printf("salary in record 4 = %d\n", manager_shared_memory->records[4].salary);
-    }
-    // else if(client_number==4)
-    // {
-    //    read_config_client("4.txt");
-    // }
+    //Every client read from his configuration file
+     char client_file[6];
+     for(int i =1 ; i<=active_clients ;i++)
+     {
+         if(client_number==i)
+         {
+            sprintf(client_file, "%d.txt", i);
+            read_config_client(client_file);
+         }
+     }    
+    
     //Detach shared memory segments
     shmdt(manager_shared_memory);
     shmdt(logger_shared_memory);
@@ -68,7 +52,10 @@ void client_add_record(char name[20], int salary, int key)
     buff.message_record.salary = salary;
     buff.type_operation = 1;
     buff.pid = getpid();
+    //char prod_msg[200];
+    //sprintf(prod_msg, "Client with pid = %d asked manager to add new record and waiting him to return real key", getpid());
     Produce("Client asked manager to add new record and waiting him to return real key");
+    //Produce(prod_msg);
     for (int i = 0; i <= 20; i++)
     {
         if (name[i] >= 'a' && name[i] <= 'z')
@@ -108,7 +95,6 @@ void client_modify(int key, int value)
  */
 void client_acquire(int key)
 {
-    printf("in acquire client---------------------------\n");
     struct message buff;
     buff.mtype = sys_info.db_manager_pid;
     buff.message_record.key = key;
@@ -128,7 +114,6 @@ void client_acquire(int key)
  */
 void client_release(int key)
 {
-    printf("in release client---------------------------\n");
     struct message buff;
     buff.mtype = sys_info.db_manager_pid;
     buff.message_record.key = key;
@@ -360,10 +345,6 @@ void read_config_client(char file_name[])
             {
                 fscanf(file_pointer, "%s", exact);
                 fscanf(file_pointer, "%s", name);
-                printf("%s ", operation_type);
-                printf("%s ", exact);
-                printf("%s ", type);
-                printf("%s \n", name);
                 if (!strcmp(exact, exact_mode))
                     select_name(name, 1);
                 else if (!strcmp(exact, starts_with_mode))
@@ -374,9 +355,6 @@ void read_config_client(char file_name[])
             {
                 char all_data[5];
                 fscanf(file_pointer, "%s", all_data);
-                printf("%s ", operation_type);
-                printf("%s ", type);
-                printf("%s \n", all_data);
                 select_all();
             }
             if (strcmp(type, hybrid_mode) == 0)
@@ -393,14 +371,6 @@ void read_config_client(char file_name[])
                 if (strcmp(hybrid_operator, operator_1) == 0)
                 {
                     fscanf(file_pointer, "%d", &salary);
-                    printf("%s ", operation_type);
-                    printf("%s ", type);
-                    printf("%s ", hybrid_name);
-                    printf("%s ", exact);
-                    printf("%s ", name);
-                    printf("%s ", hybrid_salary);
-                    printf("%s ", hybrid_operator);
-                    printf(" %d\n", salary);
 
                     if (!strcmp(exact, exact_mode))
                         select_hybrid(name, salary, 0, 1);
@@ -410,14 +380,6 @@ void read_config_client(char file_name[])
                 if (strcmp(hybrid_operator, operator_2) == 0)
                 {
                     fscanf(file_pointer, "%d", &salary);
-                    printf("%s ", operation_type);
-                    printf("%s ", type);
-                    printf("%s ", hybrid_name);
-                    printf("%s ", exact);
-                    printf("%s ", name);
-                    printf("%s ", hybrid_salary);
-                    printf("%s ", hybrid_operator);
-                    printf(" %d\n", salary);
                     if (!strcmp(exact, exact_mode))
                         select_hybrid(name, salary, 1, 1);
                     else if (!strcmp(exact, starts_with_mode))
@@ -426,14 +388,7 @@ void read_config_client(char file_name[])
                 if (strcmp(hybrid_operator, operator_3) == 0)
                 {
                     fscanf(file_pointer, "%d", &salary);
-                    printf("%s ", operation_type);
-                    printf("%s ", type);
-                    printf("%s ", hybrid_name);
-                    printf("%s ", exact);
-                    printf("%s ", name);
-                    printf("%s ", hybrid_salary);
-                    printf("%s ", hybrid_operator);
-                    printf(" %d\n", salary);
+
                     if (!strcmp(exact, exact_mode))
                         select_hybrid(name, salary, 2, 1);
                     else if (!strcmp(exact, starts_with_mode))
@@ -442,14 +397,6 @@ void read_config_client(char file_name[])
                 if (strcmp(hybrid_operator, operator_4) == 0)
                 {
                     fscanf(file_pointer, "%d", &salary);
-                    printf("%s ", operation_type);
-                    printf("%s ", type);
-                    printf("%s ", hybrid_name);
-                    printf("%s ", exact);
-                    printf("%s ", name);
-                    printf("%s ", hybrid_salary);
-                    printf("%s ", hybrid_operator);
-                    printf(" %d\n", salary);
                     if (!strcmp(exact, exact_mode))
                         select_hybrid(name, salary, 3, 1);
                     else if (!strcmp(exact, starts_with_mode))
@@ -458,14 +405,6 @@ void read_config_client(char file_name[])
                 if (strcmp(hybrid_operator, operator_5) == 0)
                 {
                     fscanf(file_pointer, "%d", &salary);
-                    printf("%s ", operation_type);
-                    printf("%s ", type);
-                    printf("%s ", hybrid_name);
-                    printf("%s ", exact);
-                    printf("%s ", name);
-                    printf("%s ", hybrid_salary);
-                    printf("%s ", hybrid_operator);
-                    printf(" %d\n", salary);
                     if (!strcmp(exact, exact_mode))
                         select_hybrid(name, salary, 4, 1);
                     else if (!strcmp(exact, starts_with_mode))
@@ -480,38 +419,22 @@ void read_config_client(char file_name[])
                 if (strcmp(operator_type, operator_1) == 0)
                 {
                     fscanf(file_pointer, "%d", &salary);
-                    printf("%s ", operation_type);
-                    printf("%s ", type);
-                    printf("%s ", operator_type);
-                    printf(" %d\n", salary);
                     select_salary(salary, 0);
                 }
 
                 if (strcmp(operator_type, operator_3) == 0)
                 {
                     fscanf(file_pointer, "%d", &salary);
-                    printf("%s ", operation_type);
-                    printf("%s ", type);
-                    printf("%s ", operator_type);
-                    printf(" %d\n", salary);
                     select_salary(salary, 2);
                 }
                 if (strcmp(operator_type, operator_4) == 0)
                 {
                     fscanf(file_pointer, "%d", &salary);
-                    printf("%s ", operation_type);
-                    printf("%s ", type);
-                    printf("%s ", operator_type);
-                    printf(" %d\n", salary);
                     select_salary(salary, 3);
                 }
                 if (strcmp(operator_type, operator_5) == 0)
                 {
                     fscanf(file_pointer, "%d", &salary);
-                    printf("%s ", operation_type);
-                    printf("%s ", type);
-                    printf("%s ", operator_type);
-                    printf(" %d\n", salary);
                     select_salary(salary, 4);
                 }
             }
