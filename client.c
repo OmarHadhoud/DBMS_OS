@@ -45,33 +45,32 @@ void client_main()
  */
 void client_add_record(char name[20], int salary, int key)
 {
-
     struct message buff;
     buff.mtype = sys_info.db_manager_pid;
     buff.message_record.key = key;
     buff.message_record.salary = salary;
     buff.type_operation = 1;
     buff.pid = getpid();
-    //char prod_msg[200];
-    //sprintf(prod_msg, "Client with pid = %d asked manager to add new record and waiting him to return real key", getpid());
+    char prod_msg[200];
+    sprintf(prod_msg, "Client with pid = %d asked manager to add new record and waiting him to return real key", getpid());
     Produce("Client asked manager to add new record and waiting him to return real key");
-    //Produce(prod_msg);
+    Produce(prod_msg);
     for (int i = 0; i <= 20; i++)
     {
         if (name[i] >= 'a' && name[i] <= 'z')
             buff.message_record.name[i] = name[i];
     }
-    int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff), !IPC_NOWAIT);
+    int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff)-sizeof(buff.mtype), !IPC_NOWAIT);
     if (send_val == -1)
         perror("Error in send");
-    printf("I am Client my pid is = %d and I added record \n", getpid());
     int rec_val = msgrcv(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), getpid(), !IPC_NOWAIT);
     if (rec_val == -1)
         perror("Error in recieve");
 
     key = buff.message_record.key;
-    printf("the new key is = %d\n", key);
     Produce("Client have received the real key");
+    sprintf(prod_msg, "I am Client my pid is = %d and I added record with name %s, salary %d and key %d\n", getpid(), name, salary, key);
+    Produce(prod_msg);
 }
 
 /*
@@ -86,7 +85,7 @@ void client_modify(int key, int value)
     buff.message_record.salary = value;
     buff.pid = getpid();
     Produce("Client asked manager to modify certain record");
-    int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff), !IPC_NOWAIT);
+    int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff)-sizeof(buff.mtype), !IPC_NOWAIT);
     if (send_val == -1)
         perror("Error in send");
 }
@@ -101,10 +100,10 @@ void client_acquire(int key)
     buff.type_operation = 3;
     buff.pid = getpid();
     Produce("Client asked manager to acquire lock of certain record");
-    int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff), !IPC_NOWAIT);
+    int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff)-sizeof(buff.mtype), !IPC_NOWAIT);
     if (send_val == -1)
         perror("Error in send");
-    int rec_val = msgrcv(sys_info.dbmanager_msgqid, &buff, sizeof(buff), getpid(), !IPC_NOWAIT);
+    int rec_val = msgrcv(sys_info.dbmanager_msgqid, &buff, sizeof(buff)-sizeof(buff.mtype), getpid(), !IPC_NOWAIT);
     if (rec_val == -1)
         perror("Error in recieve");
 }
@@ -120,7 +119,7 @@ void client_release(int key)
     buff.type_operation = 4;
     buff.pid = getpid();
     Produce("Client asked manager to release lock of certain record");
-    int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff), !IPC_NOWAIT);
+    int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff)-sizeof(buff.mtype), !IPC_NOWAIT);
     if (send_val == -1)
         perror("Error in send");
 }
