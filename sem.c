@@ -27,7 +27,7 @@ void sem_initialize(struct Sem *s)
         s = NULL;
         return;
     }
-    
+
     s->waiting_queue = create_queue();
     //If we ran out of memory, free the sem_holder and return.
     if (s->waiting_queue == NULL)
@@ -36,7 +36,8 @@ void sem_initialize(struct Sem *s)
         s = NULL;
         return;
     }
-    printf("Sem initialized  _%d\n", getpid());
+    if (SEM_VERBOS)
+        printf("Sem initialized  _%d\n", getpid());
 }
 
 /*
@@ -48,21 +49,6 @@ void sem_delete(struct Sem *s)
     delete_queue(s->waiting_queue);
 }
 
-/*void acquire_sem_msg(struct Sem *s, int pid){
-    struct MsgBuff message;
-    if (msgrcv(msgqid, &message, sizeof(message)-sizeof(message.mtype), getpid(), IPC_NOWAIT)==-1) return;
-    if (message.acquire_sem)
-    {
-        acquire_sem(sem,message.sender);
-    }else
-    {
-        release_sem(sem,message.sender);
-    }
-    if (msgsnd(msgqid, &message, sizeof(message)-sizeof(message.mtype), !IPC_NOWAIT)==-1) perror("Errror in send");
-}*/
-
-
-
 /*
  *  Acquires the semaphor to the passed process.
  *  It sends a signal to wake the process if it can acquire the semaphore,
@@ -71,21 +57,23 @@ void sem_delete(struct Sem *s)
 void acquire_sem(struct Sem *s, int pid)
 {
 
-   // printf("locked=%d and pi = %d and I am %d \n",s->locked,pid,getpid());
+    // printf("locked=%d and pi = %d and I am %d \n",s->locked,pid,getpid());
     if (s->locked == 0)
     {
-        
-        if(SEM_VERBOS) printf("sem given by %d to %d\n",(int)getpid(),pid);
+
+        if (SEM_VERBOS)
+            printf("sem given by %d to %d\n", (int)getpid(), pid);
         //Acquire the sem, wake the process.
         s->locked = 1;
         *(s->sem_holder) = (pid_t)pid;
-        kill(pid, SIGCONT);
-        if(SEM_VERBOS) printf("proccess %d resumed\n",pid);
+        if (SEM_VERBOS)
+            printf("proccess %d resumed\n", pid);
     }
-    else { //Add the process to the waiting queue.
+    else
+    { //Add the process to the waiting queue.
         enqueue(s->waiting_queue, pid);
-        kill(pid, SIGSTOP);
-        if(SEM_VERBOS) printf("proccess %d paused\n",pid);
+        if (SEM_VERBOS)
+            printf("proccess %d paused\n", pid);
     }
 }
 
@@ -97,7 +85,7 @@ void release_sem(struct Sem *s, int pid)
 {
     if (*(s->sem_holder) != pid) //Make sure the one releasing sem is the holder.
         return;
-    
+
     s->locked = 0;
     *(s->sem_holder) = -1;
     //If no process is in waiting queue, return.
