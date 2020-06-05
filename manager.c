@@ -1,4 +1,5 @@
 #include "manager.h"
+#include "query_logger.h"
 #include <sys/types.h>
 #include <sys/msg.h>
 //To use shared memory
@@ -19,8 +20,8 @@ void manager_handler(int signum)
 {
     if (signum==SIGUSR1) manager_On=0;
     printf("Parent terminating manager..\n");
-    struct MsgBuff message={.mtype = sys_info.db_manager_pid , .sender = 0 , .action = NOTIFY};
-    if (msgsnd(sys_info.logger_msgqid, &message, sizeof(message)-sizeof(message.mtype), !IPC_NOWAIT)==-1) perror("Errror in send");
+    struct message message={.mtype = sys_info.db_manager_pid , .type_operation = -1};
+    if (msgsnd(sys_info.dbmanager_msgqid, &message, sizeof(message)-sizeof(message.mtype), !IPC_NOWAIT)==-1) perror("Errror in send");
 }
 
 
@@ -29,9 +30,8 @@ void manager_handler(int signum)
  */
 void manager_main()
 {
-    //printf("I'm the manager, my pid is : %d\n", getpid());
+    printf("I'm the manager, my pid is : %d\n", getpid());
     manager_shared_memory = (struct ManagerSharedMemory *)shmat(sys_info.records_shmid, NULL, 0);
-    //printf("size of struct= %d\n",sizeof(struct ManagerSharedMemory));
     setup_records();
     signal(SIGUSR1, manager_handler);
     manager_On = 1;
@@ -52,18 +52,11 @@ void manager_main()
  */
 void manager_add_record(char name[20], int salary, int pid)
 {
-    // struct message buff;
     struct record *manager_shm_record = manager_shared_memory->records;
-    //  int rec_val = msgrcv(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record),sys_info.db_manager_pid, IPC_NOWAIT);
-    // if (rec_val == -1)
-    //  perror("Error in recieve");
-    printf("salary = %d \n", salary);
-    printf("name is %s \n", name);
-    // printf("current_key = %d \n",current_key);
-    //if(manager_shm_record[current_key])
+    char prod_msg[200];
+
     manager_shm_record[current_key].key = current_key;
 
-    //manager_shm_record[current_key].salary = buff.message_record.salary;
 
     manager_shm_record[current_key].salary = salary;
 
@@ -73,6 +66,9 @@ void manager_add_record(char name[20], int salary, int pid)
             manager_shm_record[current_key].name[i] = name[i];
     }
 
+    sprintf(prod_msg,"Client with pid %d added a record with name %s and salary %d", pid, name, salary);
+    //Produce(prod_msg);
+
     manager_shm_record[current_key].sem1 = malloc(sizeof(struct Sem));
     sem_initialize(manager_shm_record[current_key].sem1);
     struct message buff;
@@ -81,7 +77,6 @@ void manager_add_record(char name[20], int salary, int pid)
     buff.message_record.key = current_key++;
     //buff.mtype = buff.pid;
     buff.mtype = pid;
-    printf("I added from client %d\n", pid);
     int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff.message_record), !IPC_NOWAIT);
 
     if (send_val == -1)
@@ -99,7 +94,9 @@ void manager_modify(int key, int value)
     }
     else
     {
-        printf("I will modify salary with= %d of record %d \n", value, key);
+        char prod_msg[200];
+        sprintf(prod_msg,"I will modify salary with= %d of record %d", value, key);
+        //Produce(prod_msg);
         struct record *manager_shm_record = manager_shared_memory->records;
         manager_shm_record[key].salary += value;
     }
@@ -117,12 +114,14 @@ void manager_acquire(int key, int pid)
     else
     {
         struct record *manager_shm_record = manager_shared_memory->records;
-        printf("I will acquire sem now key = %d and pid =%d \n", key, pid);
+        char prod_msg[200];
+        sprintf(prod_msg,"I will acquire sem now key = %d and pid =%d \n", key, pid);
+        //Produce(prod_msg);
         if (&manager_shm_record[key].sem1)
             acquire_sem(manager_shm_record[key].sem1, pid);
         struct message buff;
         buff.mtype = pid;
-        int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff), !IPC_NOWAIT);
+        int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff)-sizeof(buff.mtype), !IPC_NOWAIT);
         if (send_val == -1)
             perror("Error in send");
     }
@@ -140,7 +139,7 @@ void manager_release(int key, int pid)
     else
     {
         struct record *manager_shm_record = manager_shared_memory->records;
-        printf("I will release sem now \n");
+        //Produce("I will release sem now \n");
         release_sem(manager_shm_record[key].sem1, pid);
     }
 }
@@ -148,22 +147,22 @@ void check_operation()
 {
 
     struct message buff;
-    int rec_val = msgrcv(sys_info.dbmanager_msgqid, &buff, sizeof(buff), sys_info.db_manager_pid, !IPC_NOWAIT);
-    if (rec_val == -1)
+    int rec_val = msgrcv(sys_info.dbmanager_msgqid, &buff, sizeof(buff)-sizeof(buff.mtype), sys_info.db_manager_pid, !IPC_NOWAIT);
+    if (rec_val == -1 && manager_On)
         perror("Error in recieve");
 
-    else
+    else if(manager_On)
     {
         int type = buff.type_operation;
 
         if (type == 1)
         {
-            //  Produce("the manager add record and return the key to client");
+            //  //Produce("the manager add record and return the key to client");
             manager_add_record(buff.message_record.name, buff.message_record.salary, buff.pid);
         }
         else if (type == 2)
         {
-            //Produce("the manager add record and return the key to client");
+            ////Produce("the manager add record and return the key to client");
             manager_modify(buff.message_record.key, buff.message_record.salary);
         }
         else if (type == 3)
