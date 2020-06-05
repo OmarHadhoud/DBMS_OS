@@ -31,7 +31,7 @@ struct LoggerSharedMemory {
 struct LoggerSharedMemory *logger_shared_memory;
 struct Sem sem;
 int current_number_of_produced;
-int loggerOn; 
+int loggerOn; //the variable responsible for the logger (changed to zero on receiving SIG_USR1 )
 
 void MsgSystem();
 void Produce(char *msg);

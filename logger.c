@@ -36,6 +36,7 @@ void MsgSystem(){
     }
     if (message.action==ACQUIRE) 
     {
+        if((logger_shared_memory->producer_idx+1)%MEM_SIZE == logger_shared_memory->consumer_idx%MEM_SIZE ) Consume(); //if the queue is full consume before giving sem
 
         acquire_sem(&sem,message.sender);
         message.mtype=message.sender;
@@ -59,7 +60,6 @@ void Produce(char *msg){
     log.client_pid = getpid();
     strcpy(log.msg, msg);
 
-    kill(sys_info.logger_pid, SIGCONT);
     struct MsgBuff message={.mtype = sys_info.logger_pid , .sender = getpid() , .action = ACQUIRE};
     //send request to produce
     if(L_VERBOS) printf("Sending message to produce (logger) _%d\n", getpid());
@@ -70,9 +70,8 @@ void Produce(char *msg){
     //entered critical section check if the queue is full
     logger_shared_memory->waiting_pid=getpid();
 
-    kill(sys_info.logger_pid, SIGCONT);
-    while ((logger_shared_memory->producer_idx+1)%MEM_SIZE == logger_shared_memory->consumer_idx%MEM_SIZE )
-    {} //queue full please sleep
+    //logger checks if the queue is full before giving the sem (no need to recheck)
+
     // adding logs
     logger_shared_memory->logs_array[(logger_shared_memory->producer_idx+1)%MEM_SIZE].client_pid = log.client_pid;
     strcpy(logger_shared_memory->logs_array[(logger_shared_memory->producer_idx+1)%MEM_SIZE].msg,log.msg);
@@ -84,7 +83,6 @@ void Produce(char *msg){
     //release the sem
     if (msgsnd(sys_info.logger_msgqid, &message, sizeof(message)-sizeof(message.mtype), !IPC_NOWAIT)==-1) perror("Errror in send");
     if(L_VERBOS) printf("Semaphore released _%d\n", getpid());
-    kill(sys_info.logger_pid, SIGCONT);
   //  printf("prod-----:  %d-%d = %d \n",logger_shared_memory->producer_idx,logger_shared_memory->consumer_idx,current_number_of_produced);
 }
 /*
@@ -94,7 +92,7 @@ int Consume(){
     struct SingleLog log;
     if ((logger_shared_memory->producer_idx%MEM_SIZE == logger_shared_memory->consumer_idx%MEM_SIZE ))
     {     
-        //kill(getpid(), SIGSTOP);
+
         if (current_number_of_produced) if(L_VERBOS) printf("\n Didn't consume %d\n", current_number_of_produced);
         return 1;
     } //no logs to consume
@@ -156,7 +154,7 @@ void logger_main()
         MsgSystem();
         Consume();
         current_number_of_produced=logger_shared_memory->producer_idx- logger_shared_memory->consumer_idx;
-
+        if(current_number_of_produced)printf("--------p:%d c:%d\n",logger_shared_memory->producer_idx,logger_shared_memory->consumer_idx);
     }
     sem_delete(&sem);
     //Detach from logger shared memory  
