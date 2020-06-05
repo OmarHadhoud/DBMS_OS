@@ -203,14 +203,14 @@ void parent_main()
         num_forked--;
         if(check_client(dead_process))
             active_clients--;
-        printf("\nCurrent clients: %d\n",active_clients > 0 ? active_clients : 0);
+        if(active_clients >= 0)
+            printf("\nCurrent clients: %d\n",active_clients > 0 ? active_clients : 0);
         //If all clients are dead; i.e. system is done
         if (active_clients==0)
         {
+            sleep(2); //Leave time to manager to finish what it is doing
             //Send signals to util processes to die.
             kill(sys_info.query_logger_pid, SIGUSR1);
-            //TODO: change to SIGUSR1
-          //  kill(sys_info.db_manager_pid, SIGCONT); //TODO: Remove this, for now it used until done by messages
             kill(sys_info.db_manager_pid, SIGUSR1);
             kill(sys_info.deadlock_detector_pid, SIGTERM);
             sleep(2); //Leave time to logger to log every process dying
