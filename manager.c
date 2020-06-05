@@ -1,5 +1,9 @@
 #include "manager.h"
-#include "query_logger.h"
+
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/mman.h>
+
 #include <sys/types.h>
 #include <sys/msg.h>
 //To use shared memory
@@ -10,6 +14,7 @@
 #include <string.h>
 //To allocate and free memory we need stdlib.
 #include <stdlib.h>
+
 
 int current_key = 0;
 
@@ -32,9 +37,11 @@ void manager_main()
 {
     printf("I'm the manager, my pid is : %d\n", getpid());
     manager_shared_memory = (struct ManagerSharedMemory *)shmat(sys_info.records_shmid, NULL, 0);
+    logger_shared_memory = (struct LoggerSharedMemory *)shmat(sys_info.logger_shmid, NULL, 0);
     setup_records();
     signal(SIGUSR1, manager_handler);
     manager_On = 1;
+
     while (manager_On)
     {
         check_operation();
@@ -44,6 +51,7 @@ void manager_main()
         sem_delete(manager_shared_memory->records[i].sem1);
         free(manager_shared_memory->records[i].sem1);
     }
+    shmdt(logger_shared_memory);
     shmdt(manager_shared_memory);
 }
 
@@ -65,9 +73,9 @@ void manager_add_record(char name[20], int salary, int pid)
         if (name[i] >= 'a' && name[i] <= 'z')
             manager_shm_record[current_key].name[i] = name[i];
     }
-
+    
     sprintf(prod_msg,"Client with pid %d added a record with name %s and salary %d", pid, name, salary);
-    //Produce(prod_msg);
+    Produce(prod_msg);
 
     manager_shm_record[current_key].sem1 = malloc(sizeof(struct Sem));
     sem_initialize(manager_shm_record[current_key].sem1);
@@ -96,7 +104,7 @@ void manager_modify(int key, int value)
     {
         char prod_msg[200];
         sprintf(prod_msg,"I will modify salary with= %d of record %d", value, key);
-        //Produce(prod_msg);
+        Produce(prod_msg);
         struct record *manager_shm_record = manager_shared_memory->records;
         manager_shm_record[key].salary += value;
     }
@@ -116,7 +124,7 @@ void manager_acquire(int key, int pid)
         struct record *manager_shm_record = manager_shared_memory->records;
         char prod_msg[200];
         sprintf(prod_msg,"I will acquire sem now key = %d and pid =%d \n", key, pid);
-        //Produce(prod_msg);
+        Produce(prod_msg);
         if (&manager_shm_record[key].sem1)
             acquire_sem(manager_shm_record[key].sem1, pid);
         struct message buff;
@@ -139,7 +147,7 @@ void manager_release(int key, int pid)
     else
     {
         struct record *manager_shm_record = manager_shared_memory->records;
-        //Produce("I will release sem now \n");
+        Produce("I will release sem now \n");
         release_sem(manager_shm_record[key].sem1, pid);
     }
 }
@@ -157,12 +165,12 @@ void check_operation()
 
         if (type == 1)
         {
-            //  //Produce("the manager add record and return the key to client");
+            Produce("the manager add record and return the key to client");
             manager_add_record(buff.message_record.name, buff.message_record.salary, buff.pid);
         }
         else if (type == 2)
         {
-            ////Produce("the manager add record and return the key to client");
+            Produce("the manager add record and return the key to client");
             manager_modify(buff.message_record.key, buff.message_record.salary);
         }
         else if (type == 3)

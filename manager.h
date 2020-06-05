@@ -3,15 +3,12 @@
 
 #include "sem.h"
 #include "parent.h"
+#include "query_logger.h"
+#include "logger.h"
 
-#include <signal.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/mman.h>
-//To use pid_t
-#include <sys/types.h>
+
+
+
 //Definition of manager process
 
 /*

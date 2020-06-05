@@ -36,8 +36,8 @@ void client_main()
      }    
     
     //Detach shared memory segments
-    shmdt(manager_shared_memory);
     shmdt(logger_shared_memory);
+    shmdt(manager_shared_memory);
 }
 
 /*

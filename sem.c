@@ -56,8 +56,6 @@ void sem_delete(struct Sem *s)
  */
 void acquire_sem(struct Sem *s, int pid)
 {
-
-    // printf("locked=%d and pi = %d and I am %d \n",s->locked,pid,getpid());
     if (s->locked == 0)
     {
 

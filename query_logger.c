@@ -9,6 +9,16 @@
 //To use Msgs
 #include <sys/types.h>
 #include <sys/msg.h>
+//To use shared memory
+#include <sys/ipc.h>
+#include <sys/shm.h>
+
+
+
+
+
+
+
 
 /*
  * Handles sempahores management
