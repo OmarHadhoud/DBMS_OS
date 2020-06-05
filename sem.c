@@ -51,7 +51,6 @@ void sem_delete(struct Sem *s)
 
 /*
  *  Acquires the semaphor to the passed process.
- *  It sends a signal to wake the process if it can acquire the semaphore,
  *  if it can't, it will add it to the waiting queue.
  */
 void acquire_sem(struct Sem *s, int pid)
@@ -77,7 +76,7 @@ void acquire_sem(struct Sem *s, int pid)
 
 /*
  *  Releases the semaphor passed.
- *  Wakes up the next process in waiting queue of this semaphore, if there was any.
+ *  Gives the semaphore to the next process in waiting queue of this semaphore, if there was any.
  */
 void release_sem(struct Sem *s, int pid)
 {
