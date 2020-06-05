@@ -1,6 +1,7 @@
 sleep 2
 add ibrahim 3000 2
 add sayed 8000 20
+acquire 0
 modify 0 -1000
 query name starts_with ib
 query salary > 4000

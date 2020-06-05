@@ -1,11 +1,14 @@
 add ahmed 5000 5
 add omar 7000 6
 add mohamed 4000 8
+acquire 2
 modify 2 2000
 sleep 5
-acquire 1
+acquire 3
 modify 3 4000
-acquire 2
+release 3
+acquire 1
+release 2
 release 1
 add andrew 1000 2
 add antonio 2000 3

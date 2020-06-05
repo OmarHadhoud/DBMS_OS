@@ -94,19 +94,29 @@ void manager_add_record(char name[20], int salary, int pid)
 /*
  * add or subtract a certain value to the salary of a certain record.
  */
-void manager_modify(int key, int value)
+void manager_modify(int key, int value,int pid)
 {
-    if (key > current_key)
+    if (key > current_key|| manager_shared_memory->records[key].sem1->locked==0)
     {
-        printf("the record have not initialized yet");
+       printf("acquire first or the record  have not initialized yet\n");
     }
     else
     {
+        int locker_pid = *(manager_shared_memory->records[key].sem1->sem_holder);
+        if(pid==locker_pid)
+        {        
+
         char prod_msg[200];
         sprintf(prod_msg,"I will modify salary with= %d of record %d", value, key);
         Produce(prod_msg);
         struct record *manager_shm_record = manager_shared_memory->records;
         manager_shm_record[key].salary += value;
+        }
+        else
+        {
+             printf("you do not have the lock of record\n");
+        }
+        
     }
 }
 
@@ -171,7 +181,7 @@ void check_operation()
         else if (type == 2)
         {
             Produce("the manager add record and return the key to client");
-            manager_modify(buff.message_record.key, buff.message_record.salary);
+            manager_modify(buff.message_record.key, buff.message_record.salary,buff.pid);
         }
         else if (type == 3)
         {
