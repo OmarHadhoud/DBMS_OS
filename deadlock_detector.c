@@ -6,6 +6,6 @@
  */
 void deadlock_detector_main()
 {
-    printf("I'm the deadlock_detector, my pid is : %d\n", getpid());
+    printf("I'm the deadlock_detector -still not implemented-, my pid is : %d\n", getpid());
     while(1){}
 }
