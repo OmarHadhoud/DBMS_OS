@@ -1,0 +1,24 @@
+2020-06-06 22:31:32: Client asked manager to add new record and waiting him to return real key
+2020-06-06 22:31:32: Client with pid = 2902 asked manager to add new record and waiting him to return real key
+2020-06-06 22:31:32: Client have received the real key
+2020-06-06 22:31:32: I am Client my pid is = 2902 and I added record with name ibrahim, salary 3000 and key 3
+
+2020-06-06 22:31:32: Client asked manager to add new record and waiting him to return real key
+2020-06-06 22:31:32: Client with pid = 2902 asked manager to add new record and waiting him to return real key
+2020-06-06 22:31:32: Client have received the real key
+2020-06-06 22:31:32: I am Client my pid is = 2902 and I added record with name sayed, salary 8000 and key 4
+
+2020-06-06 22:31:32: Client asked manager to acquire lock of certain record
+2020-06-06 22:31:32: Client asked manager to modify certain record
+2020-06-06 22:31:32: I'm asking to acquire the query logger semaphore
+2020-06-06 22:31:32: Opened the query logger file to append to it my queries.
+
+2020-06-06 22:31:32: Printed the queries!
+
+2020-06-06 22:31:32: Closed the query logger file after appending my queries
+2020-06-06 22:31:32: I'm asking to release the query logger semaphore
+2020-06-06 22:32:02: Client asked manager to add new record and waiting him to return real key
+2020-06-06 22:32:02: Client with pid = 2902 asked manager to add new record and waiting him to return real key
+2020-06-06 22:32:02: Client have received the real key
+2020-06-06 22:32:02: I am Client my pid is = 2902 and I added record with name bigboss, salary 100000 and key 7
+

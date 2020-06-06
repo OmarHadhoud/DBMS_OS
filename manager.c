@@ -61,18 +61,14 @@ void manager_main()
 void manager_add_record(char name[20], int salary, int pid)
 {
     struct record *manager_shm_record = manager_shared_memory->records;
-    char prod_msg[200];
+    char prod_msg[MAX_LOG_LINE_SIZE];
 
     manager_shm_record[current_key].key = current_key;
 
 
     manager_shm_record[current_key].salary = salary;
-
-    for (int i = 0; i <= 20; i++)
-    {
-        if (name[i] >= 'a' && name[i] <= 'z')
-            manager_shm_record[current_key].name[i] = name[i];
-    }
+    strcpy(manager_shm_record[current_key].name,name);
+    
     
     sprintf(prod_msg,"Client with pid %d added a record with name %s and salary %d", pid, name, salary);
     Produce(prod_msg);
@@ -106,7 +102,7 @@ void manager_modify(int key, int value,int pid)
         if(pid==locker_pid)
         {        
 
-        char prod_msg[200];
+        char prod_msg[MAX_LOG_LINE_SIZE];
         sprintf(prod_msg,"I will modify salary with= %d of record %d", value, key);
         Produce(prod_msg);
         struct record *manager_shm_record = manager_shared_memory->records;
@@ -132,7 +128,7 @@ void manager_acquire(int key, int pid)
     else
     {
         struct record *manager_shm_record = manager_shared_memory->records;
-        char prod_msg[200];
+        char prod_msg[MAX_LOG_LINE_SIZE];
         sprintf(prod_msg,"I will acquire sem now key = %d and pid =%d \n", key, pid);
         Produce(prod_msg);
         if (&manager_shm_record[key].sem1)

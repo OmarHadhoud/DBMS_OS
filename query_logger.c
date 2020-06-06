@@ -33,7 +33,7 @@ void query_log_sem_controller()
     {
         acquire_sem(&query_sem, message.sender);        
         //Printing in log file of query logger
-        char msg[80] = "Process with pid ";
+        char msg[MAX_LOG_LINE_SIZE] = "Process with pid ";
         char pid[10];
         sprintf(pid, "%d", message.sender);
         strcat(msg, pid);
@@ -50,7 +50,7 @@ void query_log_sem_controller()
     {
         release_sem(&query_sem, message.sender);
         //Printing in log file of query logger
-        char msg[80] = "Process with pid ";
+        char msg[MAX_LOG_LINE_SIZE] = "Process with pid ";
         char pid[10];
         sprintf(pid, "%d", message.sender);
         strcat(msg, pid);

@@ -1,0 +1,41 @@
+2020-06-06 22:31:30: the manager add record and return the key to client
+2020-06-06 22:31:30: Client with pid 2901 added a record with name ahmed and salary 5000
+2020-06-06 22:31:30: the manager add record and return the key to client
+2020-06-06 22:31:30: Client with pid 2901 added a record with name omar and salary 7000
+2020-06-06 22:31:30: the manager add record and return the key to client
+2020-06-06 22:31:30: Client with pid 2901 added a record with name mohamed and salary 4000
+2020-06-06 22:31:30: I will acquire sem now key = 2 and pid =2901 
+
+2020-06-06 22:31:30: the manager add record and return the key to client
+2020-06-06 22:31:30: I will modify salary with= 2000 of record 2
+2020-06-06 22:31:32: the manager add record and return the key to client
+2020-06-06 22:31:32: Client with pid 2902 added a record with name ibrahim and salary 3000
+2020-06-06 22:31:32: the manager add record and return the key to client
+2020-06-06 22:31:32: Client with pid 2902 added a record with name sayed and salary 8000
+2020-06-06 22:31:32: I will acquire sem now key = 0 and pid =2902 
+
+2020-06-06 22:31:32: the manager add record and return the key to client
+2020-06-06 22:31:32: I will modify salary with= -1000 of record 0
+2020-06-06 22:31:33: I will acquire sem now key = 1 and pid =2903 
+
+2020-06-06 22:31:35: I will acquire sem now key = 3 and pid =2901 
+
+2020-06-06 22:31:35: the manager add record and return the key to client
+2020-06-06 22:31:35: I will modify salary with= 4000 of record 3
+2020-06-06 22:31:35: I will release sem now 
+
+2020-06-06 22:31:35: I will acquire sem now key = 1 and pid =2901 
+
+2020-06-06 22:31:35: I will release sem now 
+
+2020-06-06 22:31:35: I will release sem now 
+
+2020-06-06 22:31:35: the manager add record and return the key to client
+2020-06-06 22:31:35: Client with pid 2901 added a record with name andrew and salary 1000
+2020-06-06 22:31:35: the manager add record and return the key to client
+2020-06-06 22:31:35: Client with pid 2901 added a record with name antonio and salary 2000
+2020-06-06 22:31:45: I will release sem now 
+
+2020-06-06 22:32:02: the manager add record and return the key to client
+2020-06-06 22:32:02: Client with pid 2902 added a record with name bigboss and salary 100000
+2020-06-06 22:32:15: the manager add record and return the key to client

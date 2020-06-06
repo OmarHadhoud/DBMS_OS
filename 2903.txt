@@ -1,0 +1,24 @@
+2020-06-06 22:31:30: I'm asking to acquire the query logger semaphore
+2020-06-06 22:31:30: Opened the query logger file to append to it my queries.
+
+2020-06-06 22:31:30: Printed the queries!
+
+2020-06-06 22:31:30: Closed the query logger file after appending my queries
+2020-06-06 22:31:30: I'm asking to release the query logger semaphore
+2020-06-06 22:31:33: Client asked manager to acquire lock of certain record
+2020-06-06 22:31:45: Client asked manager to release lock of certain record
+2020-06-06 22:31:45: I'm asking to acquire the query logger semaphore
+2020-06-06 22:31:45: Opened the query logger file to append to it my queries.
+
+2020-06-06 22:31:45: Printed the queries!
+
+2020-06-06 22:31:45: Closed the query logger file after appending my queries
+2020-06-06 22:31:45: I'm asking to release the query logger semaphore
+2020-06-06 22:32:15: I'm asking to acquire the query logger semaphore
+2020-06-06 22:32:15: Opened the query logger file to append to it my queries.
+
+2020-06-06 22:32:15: Printed the queries!
+
+2020-06-06 22:32:15: Closed the query logger file after appending my queries
+2020-06-06 22:32:15: I'm asking to release the query logger semaphore
+2020-06-06 22:32:15: Client asked manager to modify certain record

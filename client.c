@@ -51,15 +51,11 @@ void client_add_record(char name[20], int salary, int key)
     buff.message_record.salary = salary;
     buff.type_operation = 1;
     buff.pid = getpid();
-    char prod_msg[200];
+    char prod_msg[MAX_LOG_LINE_SIZE];
     sprintf(prod_msg, "Client with pid = %d asked manager to add new record and waiting him to return real key", getpid());
     Produce("Client asked manager to add new record and waiting him to return real key");
     Produce(prod_msg);
-    for (int i = 0; i <= 20; i++)
-    {
-        if (name[i] >= 'a' && name[i] <= 'z')
-            buff.message_record.name[i] = name[i];
-    }
+    strcpy(buff.message_record.name, name);
     int send_val = msgsnd(sys_info.dbmanager_msgqid, &buff, sizeof(buff)-sizeof(buff.mtype), !IPC_NOWAIT);
     if (send_val == -1)
         perror("Error in send");

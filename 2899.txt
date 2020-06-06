@@ -1,0 +1,79 @@
+2020-06-06 22:31:30: Query logger has just started...
+2020-06-06 22:31:30: Query logger initializing semaphore
+2020-06-06 22:31:30: Query logger starting its infinite loop
+2020-06-06 22:31:30: Process with pid 2903 has asked for the Semaphore.
+
+2020-06-06 22:31:30: Process with pid 2903 has released the Semaphore.
+
+2020-06-06 22:31:32: Process with pid 2902 has asked for the Semaphore.
+
+2020-06-06 22:31:32: Process with pid 2902 has released the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has asked for the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has released the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has asked for the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has released the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has asked for the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has released the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has asked for the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has released the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has asked for the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has released the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has asked for the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has released the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has asked for the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has released the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has asked for the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has released the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has released the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has asked for the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has released the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has asked for the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has released the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has asked for the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has released the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has asked for the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has released the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has asked for the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has released the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has asked for the Semaphore.
+
+2020-06-06 22:31:35: Process with pid 2901 has released the Semaphore.
+
+2020-06-06 22:31:45: Process with pid 2903 has asked for the Semaphore.
+
+2020-06-06 22:31:45: Process with pid 2903 has released the Semaphore.
+
+2020-06-06 22:32:15: Process with pid 2903 has asked for the Semaphore.
+
+2020-06-06 22:32:15: Process with pid 2903 has released the Semaphore.
+
+2020-06-06 22:32:17: Query logger finished infinite loop
+2020-06-06 22:32:17: Query logger dying...

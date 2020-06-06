@@ -35,14 +35,22 @@ void MsgSystem(){
         if((logger_shared_memory->producer_idx+1)%MEM_SIZE == logger_shared_memory->consumer_idx%MEM_SIZE ) Consume(); //if the queue is full consume before giving sem
 
         acquire_sem(&sem,message.sender);
-        message.mtype=message.sender;
-        message.sender=getpid();
-        //respond to the request (the client is waiting)
-        if (msgsnd(sys_info.logger_msgqid, &message, sizeof(message)-sizeof(message.mtype), !IPC_NOWAIT)==-1) perror("Errror in send");
+        if(*(sem.sem_holder)==message.sender){ //if sem is accquired give response
+            message.mtype=message.sender;
+            message.sender=getpid();
+            //respond to the request (the client is waiting)
+            if (msgsnd(sys_info.logger_msgqid, &message, sizeof(message)-sizeof(message.mtype), !IPC_NOWAIT)==-1) perror("Errror in send");
+        }
     
     }else if(message.action==RELEASE)
     {
         release_sem(&sem,message.sender);
+        if(*(sem.sem_holder)!=-1){//give sem to next in queue
+            message.mtype=*(sem.sem_holder);
+            message.sender=getpid();
+            //respond to the request (the client is waiting)
+            if (msgsnd(sys_info.logger_msgqid, &message, sizeof(message)-sizeof(message.mtype), !IPC_NOWAIT)==-1) perror("Errror in send");
+        }
     }
 }
 /*
