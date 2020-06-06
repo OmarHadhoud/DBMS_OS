@@ -17,15 +17,15 @@
 
 /*
  * Handles sending and receiving messages from others
+ * If a message is recived filter its type and act accordingly
+ * Mainly handles giving other processes the semaphore and giving them the acceptace message if it's their turn
  */
 void MsgSystem(){
     struct MsgBuff message={.mtype = sys_info.logger_pid , .sender = getpid() , .action = ACQUIRE};
     if(logger_shared_memory->producer_idx-logger_shared_memory->consumer_idx!=0){ //if there is a need to consume don't wait 
         if (msgrcv(sys_info.logger_msgqid, &message, sizeof(message)-sizeof(message.mtype), getpid(), IPC_NOWAIT)==-1) 
         {
-            if (current_number_of_produced) if(L_VERBOS) printf("\n Didn't rec %d\n", current_number_of_produced); 
             return; //return if no message received
-
         }
     } else  {//keep waiting for new produced if all is consumed
         if (msgrcv(sys_info.logger_msgqid, &message, sizeof(message)-sizeof(message.mtype), getpid(), !IPC_NOWAIT)==-1 ) if(loggerOn) perror("Errror in receive");
@@ -46,7 +46,9 @@ void MsgSystem(){
     }
 }
 /*
+ * This is meant to be used in other processes   
  * Sends a char* to the logger to log
+ * and waits for a acceptance message to access the shared memory
  */
 void Produce(char *msg){
     struct SingleLog log;
@@ -80,13 +82,13 @@ void Produce(char *msg){
 }
 /*
  *  Finds logs sent by other processes and logs them in their corresponding file
+ *  Returns 1 if there is nothing to consume, 0 otherwise
  */
 int Consume(){
     struct SingleLog log;
     if ((logger_shared_memory->producer_idx%MEM_SIZE == logger_shared_memory->consumer_idx%MEM_SIZE ))
     {     
-
-        if (current_number_of_produced) if(L_VERBOS) printf("\n Didn't consume %d\n", current_number_of_produced);
+        if(forked_pid==0) kill(getpid(), SIGSTOP); //if I am the sub process raise sigstop
         return 1;
     } //no logs to consume
     
@@ -101,7 +103,6 @@ int Consume(){
 
     // adding logs
     log = logger_shared_memory->logs_array[(logger_shared_memory->consumer_idx+1)%MEM_SIZE];
-    logger_shared_memory->consumer_idx++;
     char f_name[FILE_NAME_MAX];
     snprintf(f_name, FILE_NAME_MAX,"%d.txt", (int)log.client_pid);
     FILE *F = fopen(f_name, "a");
@@ -112,6 +113,7 @@ int Consume(){
     fprintf(F, "%s: %s\n",time_buffer ,log.msg);
     fflush(F);
     fclose(F);
+    logger_shared_memory->consumer_idx++;
     return 0;                       
 }
 
@@ -122,6 +124,10 @@ void handler(int signum)
 {
 	if (signum==SIGUSR1) loggerOn=0;
     printf("Parent terminating logger..\n");
+    if(forked_pid>0) {
+        kill(forked_pid, SIGTERM); //terminate the forked process 
+        printf("logger terminated forked process!\n");
+    }
     struct MsgBuff message={.mtype = sys_info.logger_pid , .sender = 0 , .action = NOTIFY};
     if (msgsnd(sys_info.logger_msgqid, &message, sizeof(message)-sizeof(message.mtype), !IPC_NOWAIT)==-1) perror("Errror in send");
 }
@@ -133,7 +139,8 @@ void logger_main()
 {
     printf("I'm the logger, my pid is : %d\n", getpid());
     signal(SIGUSR1, handler);
-    loggerOn =1;
+    loggerOn=1;
+    forked_pid=-1;
     //Attach to logger shared memory
     logger_shared_memory = (struct LoggerSharedMemory*) shmat(sys_info.logger_shmid,NULL,0);
     logger_shared_memory->consumer_idx=0;
@@ -141,11 +148,32 @@ void logger_main()
     //Initialize Semaphore
     sem_initialize(&sem);
 
-    while (loggerOn)
+    //Fork a process to handle the consuming
+    if(L_FORK) {
+        forked_pid = fork();
+        while(loggerOn){
+            if(forked_pid == -1 && L_FORK)
+            {
+                perror("Couldn't fork all the processes!");
+                //accept 1 produced then consume 1
+                MsgSystem();
+                Consume();
+            }
+            if(forked_pid == 0) //Forked process to consume only
+            {
+                Consume();
+            }else{ //main process handles the messages (semaphores)
+                MsgSystem();
+                if ((logger_shared_memory->producer_idx%MEM_SIZE == logger_shared_memory->consumer_idx%MEM_SIZE ))
+                    kill(forked_pid, SIGSTOP); //pause the consumer nothing to consume
+                else
+                    kill(forked_pid, SIGCONT); //resume the consumer
+            }    
+        }
+    }else while (loggerOn)
     {
         MsgSystem();
         Consume();
-        current_number_of_produced=logger_shared_memory->producer_idx- logger_shared_memory->consumer_idx;
     }
     sem_delete(&sem);
     //Detach from logger shared memory  

@@ -4,6 +4,10 @@
 #define FILE_NAME_MAX 20
 #define MAX_LOG_LINE_SIZE 100
 #define L_VERBOS 0
+
+#define L_FORK 1    //1 means that the logger will fork another process to handel the consuming instead of doing both
+                    //if there is issues with the fork please change this to 0
+
 #include "parent.h"
 #include "sem.h"
 //To use pid_t
@@ -32,7 +36,7 @@ struct LoggerSharedMemory *logger_shared_memory;
 struct Sem sem;
 int current_number_of_produced;
 int loggerOn; //the variable responsible for the logger (changed to zero on receiving SIG_USR1 )
-
+int forked_pid;
 void MsgSystem();
 void Produce(char *msg);
 int Consume();
